@@ -27,6 +27,18 @@ OpenTTD does not require any of the libraries to be present, but without
 liblzma you cannot open most recent savegames and without zlib you cannot
 open most older savegames or use the content downloading system.
 
+## Rust migration tools
+
+The migration work adds a Rust workspace under `rust/` for incremental
+rewrites and format compatibility tooling. To build or run Rust tools:
+
+1) Install Rust via rustup: https://rustup.rs
+2) Verify toolchain: `rustc --version` and `cargo --version`
+3) From the repo root:
+   - Build: `cargo build --manifest-path rust/Cargo.toml`
+   - Test: `cargo test --manifest-path rust/Cargo.toml`
+   - Run CLI: `cargo run -p openttd_cli --manifest-path rust/Cargo.toml -- <savegame>`
+
 ## Windows
 
 You need Microsoft Visual Studio 2022 or more recent.

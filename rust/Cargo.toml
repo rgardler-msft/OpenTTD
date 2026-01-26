@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "openttd_core",
+    "openttd_savegame",
+    "openttd_cli",
+]
+resolver = "2"

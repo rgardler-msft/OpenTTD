@@ -6,3 +6,13 @@ docs/gamedocs/*
 docs/source/*
 /out
 /vcpkg_installed
+/rust/target
+
+# worklog:gitignore:v1
+.worklog/config.yaml
+.worklog/initialized
+.worklog/worklog.db
+.worklog/worklog.db-shm
+.worklog/worklog.db-wal
+.worklog/worklog-data.jsonl
+.worklog/tmp-worktree-*

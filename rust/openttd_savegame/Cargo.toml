@@ -1,0 +1,12 @@
+[package]
+name = "openttd_savegame"
+version = "0.1.0"
+edition = "2021"
+license = "GPL-2.0-only"
+
+[dependencies]
+openttd_core = { path = "../openttd_core" }
+thiserror = "1"
+
+[dev-dependencies]
+assert_matches = "1"
