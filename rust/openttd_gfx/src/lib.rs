@@ -13,7 +13,6 @@ use sdl2::render::TextureQuery;
 use sdl2::ttf::{Font, Sdl2TtfContext};
 #[cfg(feature = "ttf")]
 use std::collections::HashMap;
-use std::path::Path;
 
 #[derive(Debug, Error)]
 pub enum GfxError {
@@ -150,6 +149,38 @@ impl Colour {
         b: 0x80,
         a: 255,
     };
+}
+
+impl Colour {
+    /// Helper method for UI background color
+    pub fn ui_background() -> Self {
+        Self::UI_BACKGROUND
+    }
+
+    /// Helper method for UI border color
+    pub fn ui_border() -> Self {
+        Self::GREY
+    }
+
+    /// Helper method for UI text color
+    pub fn ui_text() -> Self {
+        Self::UI_TEXT
+    }
+
+    /// Helper method for UI window background color
+    pub fn ui_window_background() -> Self {
+        Self::UI_BACKGROUND
+    }
+
+    /// Helper method for UI title bar color
+    pub fn ui_title_bar() -> Self {
+        Self::UI_BUTTON
+    }
+
+    /// Helper method for UI title text color
+    pub fn ui_title_text() -> Self {
+        Self::WHITE
+    }
 }
 
 /// Rectangle for drawing operations

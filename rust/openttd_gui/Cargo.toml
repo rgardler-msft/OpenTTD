@@ -1,0 +1,14 @@
+[package]
+name = "openttd_gui"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+sdl2 = "0.36"
+openttd_video = { path = "../openttd_video" }
+openttd_gfx = { path = "../openttd_gfx" }
+thiserror = "1.0"
+log = "0.4"
+
+[dev-dependencies]
+env_logger = "0.10"
