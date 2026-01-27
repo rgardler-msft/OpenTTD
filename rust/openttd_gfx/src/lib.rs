@@ -1,6 +1,8 @@
 // OpenTTD Graphics Library
 // Provides basic 2D rendering capabilities using SDL2
 
+mod font;
+
 use sdl2::pixels::Color as SdlColor;
 use sdl2::rect::Rect as SdlRect;
 use sdl2::render::Canvas;
@@ -444,17 +446,40 @@ impl<'a> GfxContext<'a> {
         self.draw_text(text, x, y, color, font_name)
     }
 
-    /// Draw text at position (stub for non-TTF builds)
+    /// Draw text at position using bitmap font
     #[cfg(not(feature = "ttf"))]
     pub fn draw_text(
         &mut self,
-        _text: &str,
-        _x: i32,
-        _y: i32,
-        _color: Colour,
+        text: &str,
+        x: i32,
+        y: i32,
+        color: Colour,
         _font_name: Option<&str>,
     ) -> Result<(), GfxError> {
-        // Text rendering not available without TTF feature
+        // Draw each character using bitmap font
+        let char_width = 8;
+        let _char_height = 8;
+        let mut curr_x = x;
+
+        for ch in text.chars() {
+            // Get the bitmap for this character
+            let bitmap = font::BitmapFont::get_char_data(ch);
+
+            // Draw each pixel of the character
+            for (row_idx, row) in bitmap.iter().enumerate() {
+                for col_idx in 0..8 {
+                    if (row >> (7 - col_idx)) & 1 == 1 {
+                        // Pixel is set, draw it
+                        self.canvas
+                            .set_draw_color(SdlColor::RGB(color.r, color.g, color.b));
+                        let rect = SdlRect::new(curr_x + col_idx as i32, y + row_idx as i32, 1, 1);
+                        let _ = self.canvas.fill_rect(rect);
+                    }
+                }
+            }
+            curr_x += char_width;
+        }
+
         Ok(())
     }
 
@@ -546,7 +571,14 @@ impl<'a> GfxContext<'a> {
         self.draw_text_aligned(text, rect, text_color, TextAlign::Center, font_name)?;
 
         #[cfg(not(feature = "ttf"))]
-        let _ = (text, text_color);
+        {
+            // Center text manually for bitmap font
+            let text_width = text.len() as i32 * 8;
+            let text_height = 8;
+            let x = rect.x + (rect.width as i32 - text_width) / 2;
+            let y = rect.y + (rect.height as i32 - text_height) / 2;
+            self.draw_text(text, x, y, text_color, font_name)?;
+        }
 
         Ok(())
     }

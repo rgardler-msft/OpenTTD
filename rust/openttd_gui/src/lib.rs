@@ -427,14 +427,8 @@ impl Widget for LabelWidget {
 
         let y = self.base.rect.y + (self.base.rect.height as i32 - 14) / 2;
 
-        // Draw text (using placeholder rect for now since we don't have text rendering)
-        let text_rect = Rect {
-            x,
-            y,
-            width: (self.text.len() * 8) as u32,
-            height: 14,
-        };
-        let _ = gfx.draw_rect(text_rect, self.colour);
+        // Draw text
+        let _ = gfx.draw_text(&self.text, x, y, self.colour, None);
     }
 
     fn set_visible(&mut self, visible: bool) {
