@@ -54,13 +54,15 @@ pub fn create_main_menu_window() -> Window {
     load_game.set_rect(Rect::new(0, 0, 340, 30));
     container.add_child(Box::new(load_game));
 
-    // Play Scenario button
-    let mut play_scenario = ButtonWidget::new(MainMenuWidgets::PLAY_SCENARIO, "Play Scenario");
+    // Play Scenario button (temporarily testing Date Selector)
+    let mut play_scenario =
+        ButtonWidget::new(MainMenuWidgets::PLAY_SCENARIO, "Date Selector (Test)");
     play_scenario.set_rect(Rect::new(0, 0, 340, 30));
     container.add_child(Box::new(play_scenario));
 
-    // Play Heightmap button
-    let mut play_heightmap = ButtonWidget::new(MainMenuWidgets::PLAY_HEIGHTMAP, "Play Heightmap");
+    // Play Heightmap button (temporarily testing League Table)
+    let mut play_heightmap =
+        ButtonWidget::new(MainMenuWidgets::PLAY_HEIGHTMAP, "League Table (Test)");
     play_heightmap.set_rect(Rect::new(0, 0, 340, 30));
     container.add_child(Box::new(play_heightmap));
 
@@ -150,12 +152,12 @@ pub fn handle_main_menu_click(widget_id: WidgetID) -> Option<String> {
             Some("LOAD_GAME".to_string())
         }
         MainMenuWidgets::PLAY_SCENARIO => {
-            println!("Play Scenario clicked");
-            Some("PLAY_SCENARIO".to_string())
+            println!("Date Selector test clicked");
+            Some("DATE_SELECTOR_TEST".to_string())
         }
         MainMenuWidgets::PLAY_HEIGHTMAP => {
-            println!("Play Heightmap clicked");
-            Some("PLAY_HEIGHTMAP".to_string())
+            println!("League Table test clicked");
+            Some("LEAGUE_TABLE_TEST".to_string())
         }
         MainMenuWidgets::EDIT_SCENARIO => {
             println!("Scenario Editor clicked");

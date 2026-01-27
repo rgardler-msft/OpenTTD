@@ -2555,3 +2555,18 @@ Conflict item=OM-0MKWHTTDX19VSJUF title=Main menu implementation type=different-
 Sync summary itemsAdded=0 itemsUpdated=2 itemsUnchanged=454
 Sync summary commentsAdded=0 commentsUnchanged=157
 --- sync end 2026-01-27T21:17:34.386Z ---
+--- sync start 2026-01-27T22:18:09.683Z file=/home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl ---
+Options json=undefined verbose=undefined dryRun=false push=true
+Starting sync for /home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl...
+Local state: 456 work items, 161 comments
+Remote state: 456 work items, 157 comments
+Conflict details suppressed (run with --verbose to print).
+Conflict details count: 2
+Conflict item=OM-0MKUZQWH210IR7YY title=GUI - Highscore type=different-timestamp local=2026-01-27T21:31:56.461Z remote=2026-01-27T21:16:54.976Z
+  field=stage chosen=local reason=local has value, remote is default local="in_review" remote="" chosen="in_review"
+Conflict item=OM-0MKUZQWLV00ESC6E title=GUI - Date/league type=different-timestamp local=2026-01-27T22:18:04.538Z remote=2026-01-26T23:08:51.624Z
+  field=status chosen=local reason=local is newer (2026-01-27T22:18:04.538Z) local="in-progress" remote="open" chosen="in-progress"
+  field=assignee chosen=local reason=local has value, remote is default local="@opencode" remote="" chosen="@opencode"
+Sync summary itemsAdded=0 itemsUpdated=1 itemsUnchanged=455
+Sync summary commentsAdded=0 commentsUnchanged=161
+--- sync end 2026-01-27T22:18:13.804Z ---
