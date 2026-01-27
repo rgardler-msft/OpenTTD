@@ -1,0 +1,17 @@
+[package]
+name = "openttd_video"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+openttd_core = { path = "../openttd_core" }
+sdl2 = { version = "0.36", optional = true }
+thiserror = "1.0"
+log = "0.4"
+
+[features]
+default = ["sdl2-backend"]
+sdl2-backend = ["sdl2"]
+
+[dev-dependencies]
+env_logger = "0.11"
