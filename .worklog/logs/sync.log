@@ -2484,3 +2484,13 @@ Conflict item=OM-0MKWHTLYL0RXZ569 title=Window/Widget system type=different-time
 Sync summary itemsAdded=0 itemsUpdated=2 itemsUnchanged=454
 Sync summary commentsAdded=0 commentsUnchanged=154
 --- sync end 2026-01-27T11:29:38.715Z ---
+--- sync start 2026-01-27T12:06:30.820Z file=/home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl ---
+Options json=undefined verbose=undefined dryRun=false push=true
+Starting sync for /home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl...
+Local state: 456 work items, 154 comments
+Remote state: 456 work items, 154 comments
+Conflict details suppressed (run with --verbose to print).
+No conflicts detected.
+Sync summary itemsAdded=0 itemsUpdated=0 itemsUnchanged=456
+Sync summary commentsAdded=0 commentsUnchanged=154
+--- sync end 2026-01-27T12:06:34.442Z ---
