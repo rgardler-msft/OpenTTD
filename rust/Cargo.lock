@@ -521,6 +521,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "384b8ab6d37215f3c5301a95a4accb5d64aa607f1fcb26a11b5303878451b4fe"
 
 [[package]]
+name = "openttd"
+version = "0.1.0"
+dependencies = [
+ "env_logger 0.11.8",
+ "log",
+ "openttd_core",
+ "openttd_gfx",
+ "openttd_gui",
+ "openttd_savegame",
+ "openttd_video",
+ "sdl2",
+]
+
+[[package]]
 name = "openttd_cli"
 version = "0.1.0"
 dependencies = [

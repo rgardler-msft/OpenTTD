@@ -36,7 +36,7 @@ pub mod sdl2_impl {
     pub struct Sdl2Driver {
         sdl_context: sdl2::Sdl,
         video_subsystem: sdl2::VideoSubsystem,
-        window: Window,
+        window: Option<Window>,
         event_pump: EventPump,
         cursor_visible: bool,
         current_mode: WindowMode,
@@ -71,7 +71,7 @@ pub mod sdl2_impl {
             Ok(Self {
                 sdl_context,
                 video_subsystem,
-                window,
+                window: Some(window),
                 event_pump,
                 cursor_visible: true,
                 current_mode: WindowMode::Windowed,
@@ -132,15 +132,28 @@ pub mod sdl2_impl {
             &self.available_resolutions
         }
 
+        /// Take ownership of the window (for creating GfxContext)
+        /// This will leave the driver without a window, so it can't be used for further operations
+        pub fn take_window(&mut self) -> Option<Window> {
+            self.window.take()
+        }
+
+        /// Get SDL context (for creating TTF context, etc.)
+        pub fn sdl_context(&self) -> &sdl2::Sdl {
+            &self.sdl_context
+        }
+
         /// Change window resolution (windowed mode)
         pub fn change_resolution(&mut self, width: u32, height: u32) -> Result<()> {
             debug!("Changing resolution to {}x{}", width, height);
 
             if self.current_mode == WindowMode::Windowed {
-                self.window.set_size(width, height).map_err(|e| {
-                    VideoError::WindowCreationFailed(format!("Failed to resize: {}", e))
-                })?;
-                self.windowed_size = Resolution::new(width, height);
+                if let Some(ref mut window) = self.window {
+                    window.set_size(width, height).map_err(|e| {
+                        VideoError::WindowCreationFailed(format!("Failed to resize: {}", e))
+                    })?;
+                    self.windowed_size = Resolution::new(width, height);
+                }
             }
 
             Ok(())
@@ -154,19 +167,26 @@ pub mod sdl2_impl {
 
             // Save current windowed size before going fullscreen
             if self.current_mode == WindowMode::Windowed && mode != WindowMode::Windowed {
-                let (w, h) = self.window.size();
-                self.windowed_size = Resolution::new(w, h);
+                if let Some(ref window) = self.window {
+                    let (w, h) = window.size();
+                    self.windowed_size = Resolution::new(w, h);
+                }
             }
 
             let fullscreen_type = match mode {
                 WindowMode::Windowed => {
                     // Restore windowed size when exiting fullscreen
                     if self.current_mode != WindowMode::Windowed {
-                        self.window
-                            .set_size(self.windowed_size.width, self.windowed_size.height)
-                            .map_err(|e| {
-                                VideoError::WindowCreationFailed(format!("Failed to resize: {}", e))
-                            })?;
+                        if let Some(ref mut window) = self.window {
+                            window
+                                .set_size(self.windowed_size.width, self.windowed_size.height)
+                                .map_err(|e| {
+                                    VideoError::WindowCreationFailed(format!(
+                                        "Failed to resize: {}",
+                                        e
+                                    ))
+                                })?;
+                        }
                     }
                     FullscreenType::Off
                 }
@@ -174,9 +194,11 @@ pub mod sdl2_impl {
                 WindowMode::FullscreenDesktop => FullscreenType::Desktop,
             };
 
-            self.window.set_fullscreen(fullscreen_type).map_err(|e| {
-                VideoError::WindowCreationFailed(format!("Failed to set fullscreen: {}", e))
-            })?;
+            if let Some(ref mut window) = self.window {
+                window.set_fullscreen(fullscreen_type).map_err(|e| {
+                    VideoError::WindowCreationFailed(format!("Failed to set fullscreen: {}", e))
+                })?;
+            }
 
             self.current_mode = mode;
 
@@ -342,21 +364,31 @@ pub mod sdl2_impl {
 
         /// Get window size
         pub fn window_size(&self) -> (u32, u32) {
-            self.window.size()
+            if let Some(ref window) = self.window {
+                window.size()
+            } else {
+                (0, 0)
+            }
         }
 
         /// Set window title
         pub fn set_title(&mut self, title: &str) {
-            self.window
-                .set_title(title)
-                .unwrap_or_else(|e| warn!("Failed to set window title: {}", e));
+            if let Some(ref mut window) = self.window {
+                window
+                    .set_title(title)
+                    .unwrap_or_else(|e| warn!("Failed to set window title: {}", e));
+            }
         }
 
         /// Get display dimensions for current display
         pub fn get_display_size(&self) -> Result<Resolution> {
-            let display_index = self.window.display_index().map_err(|e| {
-                VideoError::WindowCreationFailed(format!("Failed to get display index: {}", e))
-            })?;
+            let display_index = if let Some(ref window) = self.window {
+                window.display_index().map_err(|e| {
+                    VideoError::WindowCreationFailed(format!("Failed to get display index: {}", e))
+                })?
+            } else {
+                0 // Default to first display if no window
+            };
 
             let mode = self
                 .video_subsystem

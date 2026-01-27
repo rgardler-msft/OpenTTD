@@ -2494,3 +2494,38 @@ No conflicts detected.
 Sync summary itemsAdded=0 itemsUpdated=0 itemsUnchanged=456
 Sync summary commentsAdded=0 commentsUnchanged=154
 --- sync end 2026-01-27T12:06:34.442Z ---
+--- sync start 2026-01-27T13:10:37.309Z file=/home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl ---
+Options json=undefined verbose=undefined dryRun=false push=true
+Starting sync for /home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl...
+Local state: 456 work items, 154 comments
+Remote state: 456 work items, 154 comments
+Conflict details suppressed (run with --verbose to print).
+No conflicts detected.
+Sync summary itemsAdded=0 itemsUpdated=0 itemsUnchanged=456
+Sync summary commentsAdded=0 commentsUnchanged=154
+--- sync end 2026-01-27T13:10:40.187Z ---
+--- sync start 2026-01-27T13:11:11.493Z file=/home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl ---
+Options json=undefined verbose=undefined dryRun=false push=true
+Starting sync for /home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl...
+Local state: 456 work items, 154 comments
+Remote state: 456 work items, 154 comments
+Conflict details suppressed (run with --verbose to print).
+No conflicts detected.
+Sync summary itemsAdded=0 itemsUpdated=0 itemsUnchanged=456
+Sync summary commentsAdded=0 commentsUnchanged=154
+--- sync end 2026-01-27T13:11:14.704Z ---
+--- sync start 2026-01-27T19:02:20.339Z file=/home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl ---
+Options json=undefined verbose=undefined dryRun=false push=true
+Starting sync for /home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl...
+Local state: 456 work items, 155 comments
+Remote state: 456 work items, 154 comments
+Conflict details suppressed (run with --verbose to print).
+Conflict details count: 2
+Conflict item=OM-0MKWHTLYL0RXZ569 title=Window/Widget system type=different-timestamp local=2026-01-27T13:12:15.689Z remote=2026-01-27T11:29:28.160Z
+  field=status chosen=local reason=local is newer (2026-01-27T13:12:15.689Z) local="completed" remote="in-progress" chosen="completed"
+Conflict item=OM-0MKWHTTDX19VSJUF title=Main menu implementation type=different-timestamp local=2026-01-27T19:01:45.052Z remote=2026-01-27T11:08:39.045Z
+  field=status chosen=local reason=local is newer (2026-01-27T19:01:45.052Z) local="in-progress" remote="open" chosen="in-progress"
+  field=assignee chosen=local reason=local has value, remote is default local="@opencode" remote="" chosen="@opencode"
+Sync summary itemsAdded=0 itemsUpdated=2 itemsUnchanged=454
+Sync summary commentsAdded=0 commentsUnchanged=155
+--- sync end 2026-01-27T19:02:24.576Z ---

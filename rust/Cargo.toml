@@ -1,7 +1,11 @@
 [workspace]
 members = [
+    "openttd",
     "openttd_core",
     "openttd_savegame",
-    "openttd_cli", "openttd_video", "openttd_gfx", "openttd_gui",
+    "openttd_cli",
+    "openttd_video",
+    "openttd_gfx",
+    "openttd_gui",
 ]
 resolver = "2"

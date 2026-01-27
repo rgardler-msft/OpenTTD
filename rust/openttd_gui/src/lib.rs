@@ -3,6 +3,10 @@
 //! This module provides the window and widget system for OpenTTD's graphical user interface.
 //! It handles window management, widget layouts, event routing, and rendering.
 
+mod main_menu;
+
+pub use main_menu::{create_main_menu_window, handle_main_menu_click, MainMenuWidgets};
+
 use openttd_gfx::{ButtonState, Colour, GfxContext, Rect};
 use sdl2::event::Event;
 use sdl2::mouse::MouseButton;

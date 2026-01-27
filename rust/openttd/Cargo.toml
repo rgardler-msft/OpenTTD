@@ -1,0 +1,21 @@
+[package]
+name = "openttd"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "openttd"
+path = "src/bin/openttd.rs"
+
+[dependencies]
+openttd_core = { path = "../openttd_core" }
+openttd_savegame = { path = "../openttd_savegame" }
+openttd_video = { path = "../openttd_video", features = ["sdl2-backend"] }
+openttd_gfx = { path = "../openttd_gfx" }
+openttd_gui = { path = "../openttd_gui" }
+sdl2 = { version = "0.36" }
+env_logger = "0.11"
+log = "0.4"
+
+[features]
+default = []

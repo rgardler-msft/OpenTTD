@@ -5,14 +5,14 @@ use sdl2::pixels::Color as SdlColor;
 use sdl2::rect::Rect as SdlRect;
 use sdl2::render::Canvas;
 use sdl2::video::Window;
+use std::collections::HashMap;
+use std::path::Path;
 use thiserror::Error;
 
 #[cfg(feature = "ttf")]
 use sdl2::render::TextureQuery;
 #[cfg(feature = "ttf")]
 use sdl2::ttf::{Font, Sdl2TtfContext};
-#[cfg(feature = "ttf")]
-use std::collections::HashMap;
 
 #[derive(Debug, Error)]
 pub enum GfxError {
@@ -179,7 +179,11 @@ impl Colour {
 
     /// Helper method for UI title text color
     pub fn ui_title_text() -> Self {
-        Self::WHITE
+        Self::rgb(255, 255, 255) // White text
+    }
+
+    pub fn ui_highlight() -> Self {
+        Self::rgb(100, 150, 255) // Light blue for highlights
     }
 }
 
