@@ -67,6 +67,64 @@ fn handle_main_menu_action(window_manager: &mut WindowManager, x: i32, y: i32) -
     None
 }
 
+/// Handle toolbar button clicks and return the action to perform
+fn handle_toolbar_action(window_manager: &mut WindowManager, x: i32, y: i32) -> Option<String> {
+    // Check if toolbar window is present
+    if window_manager
+        .get_window(openttd_gui::TOOLBAR_WINDOW_ID)
+        .is_none()
+    {
+        return None;
+    }
+
+    // Toolbar is at top of screen (0, 0, screen_width, 35)
+    let toolbar_rect = openttd_gfx::Rect::new(0, 0, 800, 35);
+    if !toolbar_rect.contains_point(x, y) {
+        return None;
+    }
+
+    // Calculate which button was clicked
+    // Buttons are 30x30 with 5px spacing, starting at x=5
+    let button_x = x - 5;
+    if button_x < 0 || y < 2 || y > 32 {
+        return None;
+    }
+
+    // Each button is 30px wide with 5px spacing = 35px per button
+    let button_index = button_x / 35;
+
+    // Map button index to action
+    let actions = vec![
+        "PAUSE",          // 0: Pause
+        "FAST_FORWARD",   // 1: Fast Forward
+        "SAVE",           // 2: Save
+        "LOAD",           // 3: Load
+        "ZOOM_IN",        // 4: Zoom In
+        "ZOOM_OUT",       // 5: Zoom Out
+        "WORLD_MAP",      // 6: World Map
+        "TOWN_DIRECTORY", // 7: Town Directory
+        "SUBSIDIES",      // 8: Subsidies
+        "STATION_LIST",   // 9: Station List
+        "FINANCES",       // 10: Finances
+        "COMPANY_INFO",   // 11: Company Info
+        "GRAPH",          // 12: Graphs
+        "LEAGUE",         // 13: League Table
+        "NEWS",           // 14: News
+        "MESSAGES",       // 15: Messages
+        "SETTINGS",       // 16: Settings
+        "HELP_TOOLBAR",   // 17: Help
+        "MAIN_MENU",      // 18: Back to Main Menu
+    ];
+
+    if button_index >= 0 && (button_index as usize) < actions.len() {
+        let action = actions[button_index as usize];
+        println!("Toolbar button clicked: {}", action);
+        return Some(action.to_string());
+    }
+
+    None
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Initialize logging
     env_logger::init();
@@ -142,6 +200,47 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         continue;
                     }
 
+                    // Check for toolbar button clicks first (if toolbar is visible)
+                    if let Some(action) = handle_toolbar_action(&mut window_manager, x, y) {
+                        match action.as_str() {
+                            "MAIN_MENU" => {
+                                println!("Returning to main menu");
+                                // Hide toolbar
+                                let _ =
+                                    window_manager.remove_window(openttd_gui::TOOLBAR_WINDOW_ID);
+                                // Show main menu
+                                if let Some(main_menu) =
+                                    window_manager.get_window(openttd_gui::MainMenuWidgets::WINDOW)
+                                {
+                                    main_menu.visible = true;
+                                }
+                            }
+                            "LEAGUE" => {
+                                println!("Opening league table from toolbar");
+                                openttd_gui::show_league_table(&mut window_manager);
+                            }
+                            "PAUSE" => {
+                                println!("Game paused (not yet implemented)");
+                            }
+                            "FAST_FORWARD" => {
+                                println!("Fast forward (not yet implemented)");
+                            }
+                            "SAVE" => {
+                                println!("Save game (not yet implemented)");
+                            }
+                            "LOAD" => {
+                                println!("Load game (not yet implemented)");
+                            }
+                            "SETTINGS" => {
+                                println!("Settings (not yet implemented)");
+                            }
+                            _ => {
+                                println!("Toolbar action not yet implemented: {}", action);
+                            }
+                        }
+                        continue;
+                    }
+
                     // Check for main menu button clicks
                     if let Some(action) = handle_main_menu_action(&mut window_manager, x, y) {
                         match action.as_str() {
@@ -158,8 +257,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                                 );
                             }
                             "NEW_GAME" => {
-                                println!("New Game - not yet implemented");
-                                // TODO: Implement new game functionality
+                                println!("Starting new game - showing toolbar");
+                                // Hide main menu
+                                if let Some(main_menu) =
+                                    window_manager.get_window(openttd_gui::MainMenuWidgets::WINDOW)
+                                {
+                                    main_menu.visible = false;
+                                }
+                                // Show toolbar
+                                openttd_gui::show_toolbar(&mut window_manager, 800);
                             }
                             "LOAD_GAME" => {
                                 println!("Load Game - not yet implemented");

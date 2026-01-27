@@ -8,6 +8,7 @@ mod highscore;
 mod league;
 mod main_menu;
 mod main_menu_window;
+mod toolbar;
 
 pub use date_selector::{
     show_date_selector, DateSelectorWindow, GameDate, DATE_SELECTOR_WINDOW_ID,
@@ -21,6 +22,7 @@ pub use league::{
 };
 pub use main_menu::{create_main_menu_window, handle_main_menu_click, MainMenuWidgets};
 pub use main_menu_window::{show_main_menu, MainMenuWindow};
+pub use toolbar::{show_toolbar, ToolbarWindow, TOOLBAR_WINDOW_ID};
 
 use openttd_gfx::{ButtonState, Colour, GfxContext, Rect};
 use sdl2::event::Event;
