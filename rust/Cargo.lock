@@ -505,6 +505,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "openttd_gfx"
+version = "0.1.0"
+dependencies = [
+ "env_logger",
+ "log",
+ "openttd_video",
+ "sdl2",
+ "thiserror",
+]
+
+[[package]]
 name = "openttd_savegame"
 version = "0.1.0"
 dependencies = [

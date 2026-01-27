@@ -2411,3 +2411,41 @@ No conflicts detected.
 Sync summary itemsAdded=0 itemsUpdated=0 itemsUnchanged=453
 Sync summary commentsAdded=0 commentsUnchanged=150
 --- sync end 2026-01-27T11:02:31.784Z ---
+--- sync start 2026-01-27T11:02:59.424Z file=/home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl ---
+Options json=undefined verbose=undefined dryRun=false push=true
+Starting sync for /home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl...
+Local state: 453 work items, 150 comments
+Remote state: 453 work items, 150 comments
+Conflict details suppressed (run with --verbose to print).
+No conflicts detected.
+Sync summary itemsAdded=0 itemsUpdated=0 itemsUnchanged=453
+Sync summary commentsAdded=0 commentsUnchanged=150
+--- sync end 2026-01-27T11:03:02.835Z ---
+--- sync start 2026-01-27T11:03:08.244Z file=/home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl ---
+Options json=undefined verbose=undefined dryRun=false push=true
+Starting sync for /home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl...
+Local state: 453 work items, 150 comments
+Remote state: 453 work items, 150 comments
+Conflict details suppressed (run with --verbose to print).
+No conflicts detected.
+Sync summary itemsAdded=0 itemsUpdated=0 itemsUnchanged=453
+Sync summary commentsAdded=0 commentsUnchanged=150
+--- sync end 2026-01-27T11:03:11.248Z ---
+--- sync start 2026-01-27T11:09:14.405Z file=/home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl ---
+Options json=undefined verbose=undefined dryRun=false push=true
+Starting sync for /home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl...
+Local state: 456 work items, 152 comments
+Remote state: 453 work items, 150 comments
+Conflict details suppressed (run with --verbose to print).
+Conflict details count: 2
+Conflict item=OM-0MKUVRXFA0S1LGJK title=Window modes type=different-timestamp local=2026-01-27T11:03:42.224Z remote=2026-01-27T10:47:12.877Z
+  field=status chosen=local reason=local is newer (2026-01-27T11:03:42.224Z) local="completed" remote="in-progress" chosen="completed"
+  field=stage chosen=local reason=local has value, remote is default local="in_review" remote="" chosen="in_review"
+Conflict item=OM-0MKV15V1U1BP6XGO title=M1 Main menu layout renders type=different-timestamp local=2026-01-27T11:08:45.581Z remote=2026-01-27T01:43:57.087Z
+  field=description chosen=local reason=local is newer (2026-01-27T11:08:45.581Z) local="Main menu renders with visible options.\n\nReferences:\n- src/intro_gui.cpp (main menu implementation)\n- src/main_gui.cpp (GUI handling)  \n- src/window.cpp (window system)\n- src/widget.cpp (widget rendering)\n- src/gfx.cpp (graphics functions)\n- src/widgets/intro_widget.h (widget IDs)\n\nAcceptance criteria:\nAC1: Main menu visible.\nAC2: Buttons respond to hover/click.\nAC3: No crash when entering menu.\n\nImplementation approach:\nThe main menu requires implementing several layers:\n1. Basic 2D rendering (drawing rectangles, text)\n2. Window/widget system (layout, event handling)\n3. Main menu specific implementation\n\nThis is a significant milestone requiring GUI infrastructure that doesn't yet exist in the Rust codebase." remote="Main menu renders with visible options.\n\nReferences:\n- README.md\n\nAcceptance criteria:\nAC1: Main menu visible.\nAC2: Buttons respond to hover/click.\nAC3: No crash when entering menu.\n\nImplementation notes:\n- Files to review: See References section in description.\n- Suggested tests: Add unit tests that validate behavior described in Acceptance criteria, use sample saves under regression/ if available.\n- Suggested steps:\n- Review referenced C++ files and map types/functions to Rust equivalents.\n- Implement minimal API in Rust crate and add serialization parity tests.\n- Run existing regression save files through parser and add failing cases as tests." chosen="Main menu renders with visible options.\n\nReferences:\n- src/intro_gui.cpp (main menu implementation)\n- src/main_gui.cpp (GUI handling)  \n- src/window.cpp (window system)\n- src/widget.cpp (widget rendering)\n- src/gfx.cpp (graphics functions)\n- src/widgets/intro_widget.h (widget IDs)\n\nAcceptance criteria:\nAC1: Main menu visible.\nAC2: Buttons respond to hover/click.\nAC3: No crash when entering menu.\n\nImplementation approach:\nThe main menu requires implementing several layers:\n1. Basic 2D rendering (drawing rectangles, text)\n2. Window/widget system (layout, event handling)\n3. Main menu specific implementation\n\nThis is a significant milestone requiring GUI infrastructure that doesn't yet exist in the Rust codebase."
+  field=status chosen=local reason=local is newer (2026-01-27T11:08:45.581Z) local="in-progress" remote="Blocked" chosen="in-progress"
+  field=assignee chosen=local reason=local has value, remote is default local="@opencode" remote="" chosen="@opencode"
+  field=stage chosen=local reason=local has value, remote is default local="plan_complete" remote="" chosen="plan_complete"
+Sync summary itemsAdded=0 itemsUpdated=2 itemsUnchanged=454
+Sync summary commentsAdded=0 commentsUnchanged=152
+--- sync end 2026-01-27T11:09:18.982Z ---
