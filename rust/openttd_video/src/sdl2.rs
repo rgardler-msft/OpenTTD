@@ -8,6 +8,9 @@ use sdl2::{
     self, event::Event, render::Canvas, video::Window as Sdl2Window, video::WindowBuildError,
 };
 
+#[cfg(feature = "sdl2")]
+use crate::software::SoftwareRenderer;
+
 #[derive(Debug, Error)]
 pub enum Sdl2VideoError {
     #[error("video subsystem already initialized")]
@@ -40,7 +43,7 @@ pub enum WindowMode {
     Fullscreen,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum VideoEvent {
     Quit,
     WindowResized {
@@ -249,6 +252,8 @@ pub struct Window {
     size: VideoMode,
     #[cfg(feature = "sdl2")]
     canvas: Canvas<Sdl2Window>,
+    #[cfg(feature = "sdl2")]
+    renderer: Option<SoftwareRenderer>,
 }
 
 impl std::fmt::Debug for Window {
@@ -531,12 +536,16 @@ impl VideoSubsystem {
             canvas.clear();
             canvas.present();
 
+            // Initialize software renderer
+            let renderer = SoftwareRenderer::new(mode.width, mode.height).ok();
+
             return Ok(Window {
                 title,
                 mode: options.mode,
                 resizable: options.resizable,
                 size: mode,
                 canvas,
+                renderer,
             });
         }
 
@@ -624,6 +633,98 @@ impl Window {
 
     #[cfg(not(feature = "sdl2"))]
     pub fn render_solid_color(&mut self, _r: u8, _g: u8, _b: u8) {}
+
+    /// Mark an area of the screen as dirty (needs redrawing)
+    #[cfg(feature = "sdl2")]
+    pub fn make_dirty(&mut self, left: i32, top: i32, width: i32, height: i32) {
+        if let Some(ref mut renderer) = self.renderer {
+            renderer.make_dirty(left, top, width, height);
+        }
+    }
+
+    #[cfg(not(feature = "sdl2"))]
+    pub fn make_dirty(&mut self, _left: i32, _top: i32, _width: i32, _height: i32) {}
+
+    /// Paint dirty areas to the screen using software rendering
+    #[cfg(feature = "sdl2")]
+    pub fn paint(&mut self) -> Result<(), Sdl2VideoError> {
+        if let Some(ref mut renderer) = self.renderer {
+            renderer
+                .paint()
+                .map_err(|e| Sdl2VideoError::WindowCreateFailed(e))?;
+        }
+        Ok(())
+    }
+
+    #[cfg(not(feature = "sdl2"))]
+    pub fn paint(&mut self) -> Result<(), Sdl2VideoError> {
+        Ok(())
+    }
+
+    /// Get a pointer to the video buffer for direct pixel access
+    #[cfg(feature = "sdl2")]
+    pub fn get_video_pointer(&self) -> *mut u8 {
+        if let Some(ref renderer) = self.renderer {
+            renderer.get_video_pointer()
+        } else {
+            std::ptr::null_mut()
+        }
+    }
+
+    #[cfg(not(feature = "sdl2"))]
+    pub fn get_video_pointer(&self) -> *mut u8 {
+        std::ptr::null_mut()
+    }
+
+    /// Lock the video buffer for direct access
+    #[cfg(feature = "sdl2")]
+    pub fn lock_buffer(&mut self) -> Result<(), Sdl2VideoError> {
+        if let Some(ref mut renderer) = self.renderer {
+            renderer
+                .lock_buffer()
+                .map_err(|e| Sdl2VideoError::WindowCreateFailed(e))?;
+        }
+        Ok(())
+    }
+
+    #[cfg(not(feature = "sdl2"))]
+    pub fn lock_buffer(&mut self) -> Result<(), Sdl2VideoError> {
+        Ok(())
+    }
+
+    /// Unlock the video buffer after direct access
+    #[cfg(feature = "sdl2")]
+    pub fn unlock_buffer(&mut self) -> Result<(), Sdl2VideoError> {
+        if let Some(ref mut renderer) = self.renderer {
+            renderer
+                .unlock_buffer()
+                .map_err(|e| Sdl2VideoError::WindowCreateFailed(e))?;
+        }
+        Ok(())
+    }
+
+    #[cfg(not(feature = "sdl2"))]
+    pub fn unlock_buffer(&mut self) -> Result<(), Sdl2VideoError> {
+        Ok(())
+    }
+
+    /// Handle a resize event
+    #[cfg(feature = "sdl2")]
+    pub fn handle_resize(&mut self, width: u32, height: u32) -> Result<(), Sdl2VideoError> {
+        self.size = VideoMode::new(width, height);
+        if let Some(ref mut renderer) = self.renderer {
+            renderer
+                .handle_resize(width, height)
+                .map_err(|e| Sdl2VideoError::WindowCreateFailed(e))?;
+        }
+        Ok(())
+    }
+
+    #[cfg(not(feature = "sdl2"))]
+    pub fn handle_resize(&mut self, width: u32, height: u32) -> Result<(), Sdl2VideoError> {
+        self.size = VideoMode::new(width, height);
+        Ok(())
+    }
 }
 
 #[cfg(feature = "sdl2")]
