@@ -2224,3 +2224,98 @@ Conflict item=OM-0MKUUVO7I0KRI8G9 title=Vehicle data model type=different-timest
 Sync summary itemsAdded=0 itemsUpdated=2 itemsUnchanged=451
 Sync summary commentsAdded=0 commentsUnchanged=137
 --- sync end 2026-01-27T08:43:49.317Z ---
+--- sync start 2026-01-27T08:52:05.913Z file=/home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl ---
+Options json=undefined verbose=undefined dryRun=false push=true
+Starting sync for /home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl...
+Local state: 453 work items, 138 comments
+Remote state: 453 work items, 138 comments
+Conflict details suppressed (run with --verbose to print).
+No conflicts detected.
+Sync summary itemsAdded=0 itemsUpdated=0 itemsUnchanged=453
+Sync summary commentsAdded=0 commentsUnchanged=138
+--- sync end 2026-01-27T08:52:08.583Z ---
+--- sync start 2026-01-27T08:52:13.658Z file=/home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl ---
+Options json=undefined verbose=undefined dryRun=false push=true
+Starting sync for /home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl...
+Local state: 453 work items, 138 comments
+Remote state: 453 work items, 138 comments
+Conflict details suppressed (run with --verbose to print).
+No conflicts detected.
+Sync summary itemsAdded=0 itemsUpdated=0 itemsUnchanged=453
+Sync summary commentsAdded=0 commentsUnchanged=138
+--- sync end 2026-01-27T08:52:16.302Z ---
+--- sync start 2026-01-27T09:22:20.635Z file=/home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl ---
+Options json=undefined verbose=undefined dryRun=false push=true
+Starting sync for /home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl...
+Local state: 453 work items, 145 comments
+Remote state: 453 work items, 138 comments
+Conflict details suppressed (run with --verbose to print).
+Conflict details count: 5
+Conflict item=OM-0MKUUTAPS1RAK38O title=Core data model type=different-timestamp local=2026-01-27T08:55:47.969Z remote=2026-01-27T08:35:55.283Z
+  field=status chosen=local reason=local is newer (2026-01-27T08:55:47.969Z) local="completed" remote="in-progress" chosen="completed"
+Conflict item=OM-0MKUUTB9P1EBO11P title=Savegame format type=different-timestamp local=2026-01-27T08:56:39.097Z remote=2026-01-27T01:05:05.433Z
+  field=status chosen=local reason=local is newer (2026-01-27T08:56:39.097Z) local="in-progress" remote="open" chosen="in-progress"
+  field=assignee chosen=local reason=local has value, remote is default local="@ai-agent" remote="" chosen="@ai-agent"
+Conflict item=OM-0MKUUVO7I0KRI8G9 title=Vehicle data model type=different-timestamp local=2026-01-27T08:52:24.993Z remote=2026-01-27T08:51:06.087Z
+  field=status chosen=local reason=local is newer (2026-01-27T08:52:24.993Z) local="completed" remote="in-progress" chosen="completed"
+Conflict item=OM-0MKUV763T1H03KLY title=Town struct type=different-timestamp local=2026-01-27T08:54:17.319Z remote=2026-01-27T03:09:51.227Z
+  field=status chosen=local reason=local is newer (2026-01-27T08:54:17.319Z) local="completed" remote="open" chosen="completed"
+  field=assignee chosen=local reason=local has value, remote is default local="@ai-agent" remote="" chosen="@ai-agent"
+Conflict item=OM-0MKUV76GN0XS1M78 title=Industry struct type=different-timestamp local=2026-01-27T08:55:18.025Z remote=2026-01-27T03:09:51.070Z
+  field=status chosen=local reason=local is newer (2026-01-27T08:55:18.025Z) local="completed" remote="open" chosen="completed"
+  field=assignee chosen=local reason=local has value, remote is default local="@ai-agent" remote="" chosen="@ai-agent"
+Sync summary itemsAdded=0 itemsUpdated=5 itemsUnchanged=448
+Sync summary commentsAdded=0 commentsUnchanged=145
+--- sync end 2026-01-27T09:22:24.431Z ---
+--- sync start 2026-01-27T09:45:24.452Z file=/home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl ---
+Options json=undefined verbose=undefined dryRun=false push=true
+Starting sync for /home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl...
+Local state: 453 work items, 146 comments
+Remote state: 453 work items, 145 comments
+Conflict details suppressed (run with --verbose to print).
+Conflict details count: 1
+Conflict item=OM-0MKUUTB9P1EBO11P title=Savegame format type=different-timestamp local=2026-01-27T09:40:20.081Z remote=2026-01-27T08:56:39.097Z
+  field=stage chosen=local reason=local has value, remote is default local="in_review" remote="" chosen="in_review"
+Sync summary itemsAdded=0 itemsUpdated=0 itemsUnchanged=453
+Sync summary commentsAdded=0 commentsUnchanged=146
+--- sync end 2026-01-27T09:45:28.285Z ---
+--- sync start 2026-01-27T09:45:41.004Z file=/home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl ---
+Options json=undefined verbose=undefined dryRun=false push=true
+Starting sync for /home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl...
+Local state: 453 work items, 146 comments
+Remote state: 453 work items, 146 comments
+Conflict details suppressed (run with --verbose to print).
+No conflicts detected.
+Sync summary itemsAdded=0 itemsUpdated=0 itemsUnchanged=453
+Sync summary commentsAdded=0 commentsUnchanged=146
+--- sync end 2026-01-27T09:45:43.658Z ---
+--- sync start 2026-01-27T09:45:50.050Z file=/home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl ---
+Options json=undefined verbose=undefined dryRun=false push=true
+Starting sync for /home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl...
+Local state: 453 work items, 146 comments
+Remote state: 453 work items, 146 comments
+Conflict details suppressed (run with --verbose to print).
+No conflicts detected.
+Sync summary itemsAdded=0 itemsUpdated=0 itemsUnchanged=453
+Sync summary commentsAdded=0 commentsUnchanged=146
+--- sync end 2026-01-27T09:45:53.068Z ---
+--- sync start 2026-01-27T10:23:33.515Z file=/home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl ---
+Options json=undefined verbose=undefined dryRun=false push=true
+Starting sync for /home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl...
+Local state: 453 work items, 147 comments
+Remote state: 453 work items, 146 comments
+Conflict details suppressed (run with --verbose to print).
+Conflict details count: 4
+Conflict item=OM-0MKUUTB9P1EBO11P title=Savegame format type=different-timestamp local=2026-01-27T09:46:00.579Z remote=2026-01-27T09:40:20.081Z
+  field=status chosen=local reason=local is newer (2026-01-27T09:46:00.579Z) local="completed" remote="in-progress" chosen="completed"
+Conflict item=OM-0MKUUWY0N11LUDT5 title=Windowing + SDL2 type=different-timestamp local=2026-01-27T10:22:19.969Z remote=2026-01-27T08:46:32.511Z
+  field=status chosen=local reason=local is newer (2026-01-27T10:22:19.969Z) local="completed" remote="in-progress" chosen="completed"
+Conflict item=OM-0MKUV7BYW15HZWRH title=Header read/write type=different-timestamp local=2026-01-27T10:23:05.450Z remote=2026-01-27T04:51:31.646Z
+  field=status chosen=local reason=local is newer (2026-01-27T10:23:05.450Z) local="in-progress" remote="open" chosen="in-progress"
+  field=assignee chosen=local reason=local has value, remote is default local="@ai-agent" remote="" chosen="@ai-agent"
+Conflict item=OM-0MKV15UWA1P99RTP title=M0 Window opens/closes type=different-timestamp local=2026-01-27T10:22:29.474Z remote=2026-01-27T05:34:34.223Z
+  field=status chosen=local reason=local is newer (2026-01-27T10:22:29.474Z) local="completed" remote="in-progress" chosen="completed"
+  field=stage chosen=local reason=local is newer (2026-01-27T10:22:29.474Z) local="in_review" remote="plan_complete" chosen="in_review"
+Sync summary itemsAdded=0 itemsUpdated=4 itemsUnchanged=449
+Sync summary commentsAdded=0 commentsUnchanged=147
+--- sync end 2026-01-27T10:23:37.408Z ---

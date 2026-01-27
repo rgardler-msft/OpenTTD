@@ -198,25 +198,8 @@ impl SavegameWriter {
         // Add end-of-savegame marker
         self.chunks.extend_from_slice(&[0, 0, 0, 0, 0]);
 
-        // Build header
-        let mut result = Vec::new();
-
-        // Write magic based on compression
-        let magic = match self.header.compression {
-            CompressionType::None => b"OTTN",
-            CompressionType::Zlib => b"OTTZ",
-            CompressionType::Lzma => b"OTTX",
-            CompressionType::Lzo => b"OTTD",
-        };
-        result.extend_from_slice(magic);
-
-        // Write version (big endian)
-        result.push((self.header.version >> 8) as u8);
-        result.push((self.header.version & 0xFF) as u8);
-
-        // Write flags (big endian)
-        result.push((self.header.flags >> 8) as u8);
-        result.push((self.header.flags & 0xFF) as u8);
+        // Build header using the header's write method
+        let mut result = self.header.write();
 
         // Compress chunk data
         let compressed = match self.header.compression {
