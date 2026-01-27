@@ -3,6 +3,9 @@
 use crate::{Window, WindowID, WindowManager};
 use openttd_gfx::{Colour, GfxContext, Rect};
 
+// Window IDs for highscore windows
+pub const HIGHSCORE_WINDOW_ID: WindowID = 2000;
+
 /// Single highscore entry
 #[derive(Debug, Clone, Default)]
 pub struct HighScore {
@@ -76,8 +79,15 @@ pub fn show_highscore_table(
     _difficulty: DifficultyLevel,
     _rank: Option<i8>,
 ) -> WindowID {
+    // Close any existing highscore window
+    let _ = window_manager.remove_window(HIGHSCORE_WINDOW_ID);
+
     // Create new highscore window
-    let window = Window::new(0, "Highscore", Rect::new(50, 50, 700, 500));
+    let window = Window::new(
+        HIGHSCORE_WINDOW_ID,
+        "Highscore",
+        Rect::new(50, 50, 700, 500),
+    );
 
     window_manager.add_window(window)
 }

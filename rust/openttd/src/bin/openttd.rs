@@ -59,6 +59,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     window_manager.on_mouse_move(x, y);
                 }
                 Event::MouseButtonDown { x, y, .. } => {
+                    // Check if highscore window is open and close it on any click
+                    if window_manager
+                        .get_window(openttd_gui::HIGHSCORE_WINDOW_ID)
+                        .is_some()
+                    {
+                        let _ = window_manager.remove_window(openttd_gui::HIGHSCORE_WINDOW_ID);
+                        continue; // Skip further processing
+                    }
+
                     // Convert SDL mouse button to our mouse button type
                     let button = MouseButton::Left;
 
@@ -87,6 +96,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     // Mouse button up events are handled in MouseButtonDown for now
                 }
                 Event::KeyDown { keycode, .. } => {
+                    // Close highscore window on any keypress if it's open
+                    if window_manager
+                        .get_window(openttd_gui::HIGHSCORE_WINDOW_ID)
+                        .is_some()
+                    {
+                        let _ = window_manager.remove_window(openttd_gui::HIGHSCORE_WINDOW_ID);
+                        continue; // Skip further processing
+                    }
+
                     // ESC key to quit
                     if keycode == 27 {
                         println!("ESC pressed, exiting");

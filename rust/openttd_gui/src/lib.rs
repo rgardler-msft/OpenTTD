@@ -6,7 +6,9 @@
 mod highscore;
 mod main_menu;
 
-pub use highscore::{draw_highscore_window, show_highscore_table, DifficultyLevel, HighScore};
+pub use highscore::{
+    draw_highscore_window, show_highscore_table, DifficultyLevel, HighScore, HIGHSCORE_WINDOW_ID,
+};
 pub use main_menu::{create_main_menu_window, handle_main_menu_click, MainMenuWidgets};
 
 use openttd_gfx::{ButtonState, Colour, GfxContext, Rect};
