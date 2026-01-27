@@ -2401,3 +2401,13 @@ Conflict item=OM-0MKUVRXFA0S1LGJK title=Window modes type=different-timestamp lo
 Sync summary itemsAdded=0 itemsUpdated=2 itemsUnchanged=451
 Sync summary commentsAdded=0 commentsUnchanged=150
 --- sync end 2026-01-27T10:47:22.985Z ---
+--- sync start 2026-01-27T11:02:28.804Z file=/home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl ---
+Options json=undefined verbose=undefined dryRun=false push=true
+Starting sync for /home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl...
+Local state: 453 work items, 150 comments
+Remote state: 453 work items, 150 comments
+Conflict details suppressed (run with --verbose to print).
+No conflicts detected.
+Sync summary itemsAdded=0 itemsUpdated=0 itemsUnchanged=453
+Sync summary commentsAdded=0 commentsUnchanged=150
+--- sync end 2026-01-27T11:02:31.784Z ---
