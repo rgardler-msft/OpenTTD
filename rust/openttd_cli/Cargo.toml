@@ -6,3 +6,9 @@ license = "GPL-2.0-only"
 
 [dependencies]
 openttd_savegame = { path = "../openttd_savegame" }
+openttd_video = { path = "../openttd_video" }
+ctrlc = "3"
+
+[features]
+default = []
+sdl2 = ["openttd_video/sdl2"]
