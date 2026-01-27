@@ -41,6 +41,17 @@ impl<'a> BigEndianReader<'a> {
         Ok(i16::from_be_bytes(bytes))
     }
 
+    pub fn read_u24(&mut self) -> Result<u32, CoreError> {
+        if self.remaining() < 3 {
+            return Err(CoreError::UnexpectedEof);
+        }
+        let b1 = self.buf[self.pos] as u32;
+        let b2 = self.buf[self.pos + 1] as u32;
+        let b3 = self.buf[self.pos + 2] as u32;
+        self.pos += 3;
+        Ok((b1 << 16) | (b2 << 8) | b3)
+    }
+
     pub fn read_u32(&mut self) -> Result<u32, CoreError> {
         let bytes = self.read_exact::<4>()?;
         Ok(u32::from_be_bytes(bytes))

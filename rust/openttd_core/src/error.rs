@@ -6,4 +6,6 @@ pub enum CoreError {
     UnexpectedEof,
     #[error("invalid data: {0}")]
     InvalidData(String),
+    #[error("buffer too small")]
+    BufferTooSmall,
 }
