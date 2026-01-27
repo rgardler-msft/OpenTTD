@@ -5,7 +5,7 @@
 
 use crate::map::TileIndex;
 use crate::types::{
-    CalendarDate, CargoType, CompanyMask, EconomyDate, Owner, StationID, StringID, TownID,
+    CargoType, CompanyMask, Owner, StationID, StringID, TownID,
     INVALID_STRING_ID,
 };
 use serde::{Deserialize, Serialize};

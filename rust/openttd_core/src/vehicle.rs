@@ -46,8 +46,8 @@ pub enum Direction {
     Invalid = 0xFF,
 }
 
-/// Vehicle states bitflags
 bitflags! {
+    /// Vehicle states
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
     pub struct VehicleStates: u8 {
         const HIDDEN = 1 << 0;
@@ -103,8 +103,8 @@ pub enum EngineImageType {
     Preview = 0x21,
 }
 
-/// Vehicle random triggers
 bitflags! {
+    /// Vehicle random triggers
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
     pub struct VehicleRandomTriggers: u8 {
         const NEW_CARGO = 1 << 0;
@@ -318,6 +318,9 @@ pub struct Vehicle {
 
     // Text effect
     pub fill_percent_te_id: TextEffectID,
+
+    // Vehicle type-specific data
+    pub type_data: VehicleTypeData,
 }
 
 impl Vehicle {
@@ -382,6 +385,7 @@ impl Vehicle {
             vcache: VehicleCache::default(),
             sprite_cache: MutableSpriteCache::default(),
             fill_percent_te_id: 0xFFFF, // INVALID_TE_ID
+            type_data: VehicleTypeData::new(type_),
         }
     }
 
@@ -398,6 +402,263 @@ impl Vehicle {
     /// Check if vehicle is stopped
     pub fn is_stopped(&self) -> bool {
         self.vehstatus.contains(VehicleStates::STOPPED)
+    }
+}
+
+// ============================================================================
+// Vehicle Type-Specific Data Structures
+// ============================================================================
+
+/// Track bits for trains
+#[repr(u8)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize_repr, Deserialize_repr)]
+pub enum TrackBits {
+    None = 0x00,
+    X = 0x01,
+    Y = 0x02,
+    Upper = 0x04,
+    Lower = 0x08,
+    Left = 0x10,
+    Right = 0x20,
+    Cross = 0x40,
+    Depot = 0x80,
+    Wormhole = 0xFF,
+}
+
+bitflags! {
+    /// Rail vehicle flags (for trains)
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+    pub struct VehicleRailFlags: u16 {
+        const REVERSING = 1 << 0;
+        const POWERED_WAGON = 1 << 3;
+        const FLIPPED = 1 << 4;
+        const ALLOWED_ON_NORMAL_RAIL = 1 << 6;
+        const REVERSED = 1 << 7;
+        const STUCK = 1 << 8;
+        const LEAVING_STATION = 1 << 9;
+    }
+}
+
+/// Train force proceeding modes
+#[repr(u8)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize_repr, Deserialize_repr)]
+pub enum TrainForceProceeding {
+    None = 0,
+    Stuck = 1,
+    Signal = 2,
+}
+
+/// Train-specific cache data
+#[repr(C)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Serialize, Deserialize)]
+pub struct TrainCache {
+    pub cached_tilt: bool,
+    pub user_def_data: u8,
+    pub cached_curve_speed_mod: i16,
+    pub cached_max_curve_speed: u16,
+}
+
+/// Train-specific data fields
+#[repr(C)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TrainData {
+    pub flags: VehicleRailFlags,
+    pub crash_anim_pos: u16,
+    pub wait_counter: u16,
+    pub tcache: TrainCache,
+    pub other_multiheaded_part: Option<VehicleID>,
+    pub compatible_railtypes: u32, // Bitmask of rail types
+    pub railtypes: u32,            // Bitmask of rail types
+    pub track: TrackBits,
+    pub force_proceed: TrainForceProceeding,
+}
+
+impl Default for TrainData {
+    fn default() -> Self {
+        Self {
+            flags: VehicleRailFlags::empty(),
+            crash_anim_pos: 0,
+            wait_counter: 0,
+            tcache: TrainCache::default(),
+            other_multiheaded_part: None,
+            compatible_railtypes: 0,
+            railtypes: 0,
+            track: TrackBits::None,
+            force_proceed: TrainForceProceeding::None,
+        }
+    }
+}
+
+/// Road vehicle states
+#[repr(u8)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize_repr, Deserialize_repr)]
+pub enum RoadVehicleStates {
+    InDepot = 0xFE,
+    Wormhole = 0xFF,
+}
+
+/// Road vehicle path element
+#[repr(C)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct RoadVehPathElement {
+    pub trackdir: u8, // INVALID_TRACKDIR = 0xFF
+    pub tile: TileIndex,
+}
+
+/// Road vehicle-specific data fields
+#[repr(C)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RoadVehicleData {
+    pub path: Vec<RoadVehPathElement>, // Path cache
+    pub state: u8,
+    pub frame: u8,
+    pub blocked_ctr: u16,
+    pub overtaking: u8,
+    pub overtaking_ctr: u8,
+    pub crashed_ctr: u16,
+    pub reverse_ctr: u8,
+    pub roadtype: u8, // INVALID_ROADTYPE = 0xFF
+    pub disaster_vehicle: Option<VehicleID>,
+    pub compatible_roadtypes: u64, // Bitmask of road types
+}
+
+impl Default for RoadVehicleData {
+    fn default() -> Self {
+        Self {
+            path: Vec::new(),
+            state: 0,
+            frame: 0,
+            blocked_ctr: 0,
+            overtaking: 0,
+            overtaking_ctr: 0,
+            crashed_ctr: 0,
+            reverse_ctr: 0,
+            roadtype: 0xFF, // INVALID_ROADTYPE
+            disaster_vehicle: None,
+            compatible_roadtypes: 0,
+        }
+    }
+}
+
+/// Ship path element
+#[repr(C)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ShipPathElement {
+    pub trackdir: u8, // INVALID_TRACKDIR = 0xFF
+}
+
+/// Ship-specific data fields
+#[repr(C)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ShipData {
+    pub path: Vec<ShipPathElement>, // Path cache
+    pub state: TrackBits,
+    pub rotation: Direction,
+    pub rotation_x_pos: i16, // NOSAVE: X Position before rotation
+    pub rotation_y_pos: i16, // NOSAVE: Y Position before rotation
+}
+
+impl Default for ShipData {
+    fn default() -> Self {
+        Self {
+            path: Vec::new(),
+            state: TrackBits::None,
+            rotation: Direction::Invalid,
+            rotation_x_pos: 0,
+            rotation_y_pos: 0,
+        }
+    }
+}
+
+/// Aircraft subtype
+#[repr(u8)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize_repr, Deserialize_repr)]
+pub enum AircraftSubType {
+    Helicopter = 0,
+    Aircraft = 2,
+    Shadow = 4,
+    Rotor = 6,
+}
+
+bitflags! {
+    /// Aircraft flags
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+    pub struct VehicleAirFlags: u8 {
+        const DESTINATION_TOO_FAR = 1 << 0;
+        const IN_MAXIMUM_HEIGHT_CORRECTION = 1 << 1;
+        const IN_MINIMUM_HEIGHT_CORRECTION = 1 << 2;
+        const HELICOPTER_DIRECT_DESCENT = 1 << 3;
+    }
+}
+
+/// Aircraft cache
+#[repr(C)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Serialize, Deserialize)]
+pub struct AircraftCache {
+    pub cached_max_range_sqr: u32,
+    pub cached_max_range: u16,
+}
+
+/// Aircraft-specific data fields
+#[repr(C)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AircraftData {
+    pub crashed_counter: u16,
+    pub pos: u8,
+    pub previous_pos: u8,
+    pub targetairport: StationID,
+    pub state: u8, // Airport movement state
+    pub last_direction: Direction,
+    pub number_consecutive_turns: u8,
+    pub turn_counter: u8,
+    pub flags: VehicleAirFlags,
+    pub acache: AircraftCache,
+}
+
+impl Default for AircraftData {
+    fn default() -> Self {
+        Self {
+            crashed_counter: 0,
+            pos: 0,
+            previous_pos: 0,
+            targetairport: StationID::INVALID,
+            state: 0,
+            last_direction: Direction::Invalid,
+            number_consecutive_turns: 0,
+            turn_counter: 0,
+            flags: VehicleAirFlags::empty(),
+            acache: AircraftCache::default(),
+        }
+    }
+}
+
+/// Union-like enum to hold vehicle type-specific data
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum VehicleTypeData {
+    None,
+    Train(TrainData),
+    RoadVehicle(RoadVehicleData),
+    Ship(ShipData),
+    Aircraft(AircraftData),
+    // Effect and Disaster vehicles would have their own data here if needed
+}
+
+impl Default for VehicleTypeData {
+    fn default() -> Self {
+        VehicleTypeData::None
+    }
+}
+
+impl VehicleTypeData {
+    /// Create type-specific data based on vehicle type
+    pub fn new(vehicle_type: VehicleType) -> Self {
+        match vehicle_type {
+            VehicleType::Train => VehicleTypeData::Train(TrainData::default()),
+            VehicleType::Road => VehicleTypeData::RoadVehicle(RoadVehicleData::default()),
+            VehicleType::Ship => VehicleTypeData::Ship(ShipData::default()),
+            VehicleType::Aircraft => VehicleTypeData::Aircraft(AircraftData::default()),
+            _ => VehicleTypeData::None,
+        }
     }
 }
 
@@ -454,5 +715,75 @@ mod tests {
         assert_eq!(vehicle.tile, TileIndex::INVALID);
         assert!(!vehicle.is_crashed());
         assert!(!vehicle.is_stopped());
+
+        // Check that train-specific data is created
+        match vehicle.type_data {
+            VehicleTypeData::Train(_) => {}
+            _ => panic!("Expected Train type data"),
+        }
+    }
+
+    #[test]
+    fn test_train_data() {
+        let train_data = TrainData::default();
+        assert_eq!(train_data.crash_anim_pos, 0);
+        assert!(train_data.flags.is_empty());
+        assert_eq!(train_data.track, TrackBits::None);
+        assert_eq!(train_data.force_proceed, TrainForceProceeding::None);
+    }
+
+    #[test]
+    fn test_road_vehicle_data() {
+        let road_data = RoadVehicleData::default();
+        assert_eq!(road_data.state, 0);
+        assert_eq!(road_data.overtaking, 0);
+        assert_eq!(road_data.roadtype, 0xFF); // INVALID_ROADTYPE
+        assert!(road_data.path.is_empty());
+    }
+
+    #[test]
+    fn test_ship_data() {
+        let ship_data = ShipData::default();
+        assert_eq!(ship_data.state, TrackBits::None);
+        assert_eq!(ship_data.rotation, Direction::Invalid);
+        assert!(ship_data.path.is_empty());
+    }
+
+    #[test]
+    fn test_aircraft_data() {
+        let aircraft_data = AircraftData::default();
+        assert_eq!(aircraft_data.crashed_counter, 0);
+        assert_eq!(aircraft_data.targetairport, StationID::INVALID);
+        assert!(aircraft_data.flags.is_empty());
+        assert_eq!(aircraft_data.last_direction, Direction::Invalid);
+    }
+
+    #[test]
+    fn test_vehicle_type_data_creation() {
+        // Test that correct type data is created for each vehicle type
+        match VehicleTypeData::new(VehicleType::Train) {
+            VehicleTypeData::Train(_) => {}
+            _ => panic!("Expected Train type data"),
+        }
+
+        match VehicleTypeData::new(VehicleType::Road) {
+            VehicleTypeData::RoadVehicle(_) => {}
+            _ => panic!("Expected RoadVehicle type data"),
+        }
+
+        match VehicleTypeData::new(VehicleType::Ship) {
+            VehicleTypeData::Ship(_) => {}
+            _ => panic!("Expected Ship type data"),
+        }
+
+        match VehicleTypeData::new(VehicleType::Aircraft) {
+            VehicleTypeData::Aircraft(_) => {}
+            _ => panic!("Expected Aircraft type data"),
+        }
+
+        match VehicleTypeData::new(VehicleType::Invalid) {
+            VehicleTypeData::None => {}
+            _ => panic!("Expected None type data"),
+        }
     }
 }

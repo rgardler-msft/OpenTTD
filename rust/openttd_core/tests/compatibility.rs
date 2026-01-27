@@ -208,6 +208,57 @@ mod tests {
         assert_eq!(town_cargo.accepted.len(), 64);
         assert_eq!(town_cargo.received.len(), 64);
     }
+
+    /// Test vehicle type-specific data structures
+    #[test]
+    fn test_vehicle_type_data() {
+        // Test TrainData
+        let train_data = TrainData::default();
+        assert_eq!(train_data.crash_anim_pos, 0);
+        assert!(train_data.flags.is_empty());
+
+        // Test RoadVehicleData
+        let road_data = RoadVehicleData::default();
+        assert_eq!(road_data.state, 0);
+        assert_eq!(road_data.roadtype, 0xFF); // INVALID_ROADTYPE
+
+        // Test ShipData
+        let ship_data = ShipData::default();
+        assert_eq!(ship_data.state, TrackBits::None);
+
+        // Test AircraftData
+        let aircraft_data = AircraftData::default();
+        assert_eq!(aircraft_data.targetairport, StationID::INVALID);
+    }
+
+    /// Test vehicle type enum values
+    #[test]
+    fn test_vehicle_type_values() {
+        assert_eq!(VehicleType::Train as u8, 0);
+        assert_eq!(VehicleType::Road as u8, 1);
+        assert_eq!(VehicleType::Ship as u8, 2);
+        assert_eq!(VehicleType::Aircraft as u8, 3);
+        assert_eq!(VehicleType::Effect as u8, 4);
+        assert_eq!(VehicleType::Disaster as u8, 5);
+        assert_eq!(VehicleType::Invalid as u8, 0xFF);
+    }
+
+    /// Test aircraft subtype values
+    #[test]
+    fn test_aircraft_subtype_values() {
+        assert_eq!(AircraftSubType::Helicopter as u8, 0);
+        assert_eq!(AircraftSubType::Aircraft as u8, 2);
+        assert_eq!(AircraftSubType::Shadow as u8, 4);
+        assert_eq!(AircraftSubType::Rotor as u8, 6);
+    }
+
+    /// Test train force proceeding values
+    #[test]
+    fn test_train_force_proceeding_values() {
+        assert_eq!(TrainForceProceeding::None as u8, 0);
+        assert_eq!(TrainForceProceeding::Stuck as u8, 1);
+        assert_eq!(TrainForceProceeding::Signal as u8, 2);
+    }
 }
 
 /// Integration tests that would verify against actual C++ savegame data
