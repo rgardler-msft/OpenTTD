@@ -7,8 +7,11 @@ mod date_selector;
 mod highscore;
 mod league;
 mod main_menu;
+mod main_menu_window;
 
-pub use date_selector::{DateSelectorWindow, GameDate, DATE_SELECTOR_WINDOW_ID};
+pub use date_selector::{
+    show_date_selector, DateSelectorWindow, GameDate, DATE_SELECTOR_WINDOW_ID,
+};
 pub use highscore::{
     draw_highscore_window, show_highscore_table, DifficultyLevel, HighScore, HIGHSCORE_WINDOW_ID,
 };
@@ -17,6 +20,7 @@ pub use league::{
     LEAGUE_WINDOW_ID, PERFORMANCE_DETAIL_WINDOW_ID,
 };
 pub use main_menu::{create_main_menu_window, handle_main_menu_click, MainMenuWidgets};
+pub use main_menu_window::{show_main_menu, MainMenuWindow};
 
 use openttd_gfx::{ButtonState, Colour, GfxContext, Rect};
 use sdl2::event::Event;
@@ -655,6 +659,7 @@ pub struct Window {
     root_widget: Option<Box<dyn Widget>>,
     widgets: HashMap<WidgetID, Rc<RefCell<dyn Widget>>>,
     dirty: bool,
+    last_clicked_widget: Option<WidgetID>,
 }
 
 impl Window {
@@ -670,6 +675,7 @@ impl Window {
             root_widget: None,
             widgets: HashMap::new(),
             dirty: true,
+            last_clicked_widget: None,
         }
     }
 
