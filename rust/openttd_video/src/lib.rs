@@ -14,7 +14,7 @@ mod tests;
 pub use event::{Event, KeyModifiers, MouseButton, Result, VideoError, WindowEvent};
 
 #[cfg(feature = "sdl2-backend")]
-pub use sdl2_driver::Sdl2Driver;
+pub use sdl2_driver::{Resolution, Sdl2Driver, WindowMode};
 
 /// Video driver trait that all backends must implement
 pub trait VideoDriver {
@@ -26,6 +26,15 @@ pub trait VideoDriver {
 
     /// Set window title
     fn set_title(&mut self, title: &str);
+
+    /// Change resolution
+    fn change_resolution(&mut self, width: u32, height: u32) -> Result<()>;
+
+    /// Toggle fullscreen mode
+    fn toggle_fullscreen(&mut self) -> Result<()>;
+
+    /// Set window mode
+    fn set_window_mode(&mut self, mode: WindowMode) -> Result<()>;
 }
 
 #[cfg(feature = "sdl2-backend")]
@@ -40,5 +49,17 @@ impl VideoDriver for Sdl2Driver {
 
     fn set_title(&mut self, title: &str) {
         self.set_title(title)
+    }
+
+    fn change_resolution(&mut self, width: u32, height: u32) -> Result<()> {
+        self.change_resolution(width, height)
+    }
+
+    fn toggle_fullscreen(&mut self) -> Result<()> {
+        self.toggle_fullscreen()
+    }
+
+    fn set_window_mode(&mut self, mode: WindowMode) -> Result<()> {
+        self.set_window_mode(mode)
     }
 }
