@@ -78,8 +78,6 @@ fn main() {
             .expect("create window");
         #[cfg(feature = "sdl2")]
         window.show();
-        #[cfg(feature = "sdl2")]
-        window.render_solid_color(24, 40, 72);
         println!("window created");
         let exit_flag = Arc::new(AtomicBool::new(false));
         let exit_handle = Arc::clone(&exit_flag);
@@ -87,6 +85,14 @@ fn main() {
             exit_handle.store(true, Ordering::SeqCst);
         })
         .expect("set ctrlc handler");
+
+        // Initial test pattern draw
+        #[cfg(feature = "sdl2")]
+        {
+            window.draw_test_pattern().expect("draw test pattern");
+            window.paint().expect("paint window");
+        }
+
         loop {
             if exit_flag.load(Ordering::SeqCst) {
                 println!("exit requested");
@@ -98,6 +104,14 @@ fn main() {
                     return;
                 }
             }
+
+            // Update test pattern for animation
+            #[cfg(feature = "sdl2")]
+            {
+                window.draw_test_pattern().expect("draw test pattern");
+                window.paint().expect("paint window");
+            }
+
             std::thread::sleep(std::time::Duration::from_millis(16));
         }
     }

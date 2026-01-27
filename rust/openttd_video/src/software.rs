@@ -110,12 +110,14 @@ impl Palette {
 
 /// Software rendering backend
 pub struct SoftwareRenderer {
-    rgb_surface: Option<Surface<'static>>,
+    pub rgb_surface: Option<Surface<'static>>,
     dirty_rect: DirtyRect,
     palette: Palette,
     screen_width: u32,
     screen_height: u32,
     bits_per_pixel: u8,
+    /// Test pattern counter for visual feedback
+    test_pattern_frame: u32,
 }
 
 impl SoftwareRenderer {
@@ -128,6 +130,7 @@ impl SoftwareRenderer {
             screen_width: width,
             screen_height: height,
             bits_per_pixel: 32, // Default to 32-bit color
+            test_pattern_frame: 0,
         })
     }
 
@@ -223,6 +226,49 @@ impl SoftwareRenderer {
 
         // Clear the dirty rect
         self.dirty_rect.clear();
+
+        Ok(())
+    }
+
+    /// Draw a test pattern to verify rendering works
+    pub fn draw_test_pattern(&mut self) -> Result<(), String> {
+        if let Some(ref mut surface) = self.rgb_surface {
+            // Increment frame counter for animation
+            self.test_pattern_frame = self.test_pattern_frame.wrapping_add(1);
+
+            // Get surface properties before locking
+            let pitch = surface.pitch() as usize;
+            let bytes_per_pixel = surface.pixel_format_enum().byte_size_per_pixel();
+            let width = self.screen_width;
+            let height = self.screen_height;
+            let frame = self.test_pattern_frame;
+
+            // Lock the surface to get pixel access
+            surface.with_lock_mut(|pixels: &mut [u8]| {
+                // Draw a gradient with animated color based on frame counter
+                for y in 0..height {
+                    for x in 0..width {
+                        let offset = y as usize * pitch + x as usize * bytes_per_pixel;
+
+                        // Create an animated color pattern
+                        let r = ((x as f32 / width as f32) * 255.0) as u8;
+                        let g = ((y as f32 / height as f32) * 255.0) as u8;
+                        let b = ((frame % 256) as f32) as u8;
+
+                        // Write BGRA format (SDL's default for 32-bit)
+                        if offset + 3 < pixels.len() {
+                            pixels[offset] = b; // Blue
+                            pixels[offset + 1] = g; // Green
+                            pixels[offset + 2] = r; // Red
+                            pixels[offset + 3] = 255; // Alpha
+                        }
+                    }
+                }
+            });
+
+            // Mark entire screen as dirty
+            self.make_dirty(0, 0, self.screen_width as i32, self.screen_height as i32);
+        }
 
         Ok(())
     }

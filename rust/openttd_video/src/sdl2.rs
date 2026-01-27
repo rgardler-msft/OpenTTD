@@ -649,9 +649,30 @@ impl Window {
     #[cfg(feature = "sdl2")]
     pub fn paint(&mut self) -> Result<(), Sdl2VideoError> {
         if let Some(ref mut renderer) = self.renderer {
+            // First, let the renderer update its internal surface
             renderer
                 .paint()
                 .map_err(|e| Sdl2VideoError::WindowCreateFailed(e))?;
+
+            // Get the renderer's surface and convert to texture for display
+            if let Some(ref surface) = renderer.rgb_surface {
+                // Create texture from surface
+                let texture_creator = self.canvas.texture_creator();
+                let texture = texture_creator
+                    .create_texture_from_surface(surface)
+                    .map_err(|e| Sdl2VideoError::WindowCreateFailed(e.to_string()))?;
+
+                // Clear the canvas
+                self.canvas.clear();
+
+                // Copy the texture to the canvas
+                self.canvas
+                    .copy(&texture, None, None)
+                    .map_err(|e| Sdl2VideoError::WindowCreateFailed(e.to_string()))?;
+
+                // Present the canvas
+                self.canvas.present();
+            }
         }
         Ok(())
     }
@@ -674,6 +695,22 @@ impl Window {
     #[cfg(not(feature = "sdl2"))]
     pub fn get_video_pointer(&self) -> *mut u8 {
         std::ptr::null_mut()
+    }
+
+    /// Draw a test pattern to verify rendering pipeline
+    #[cfg(feature = "sdl2")]
+    pub fn draw_test_pattern(&mut self) -> Result<(), Sdl2VideoError> {
+        if let Some(ref mut renderer) = self.renderer {
+            renderer
+                .draw_test_pattern()
+                .map_err(|e| Sdl2VideoError::WindowCreateFailed(e))?;
+        }
+        Ok(())
+    }
+
+    #[cfg(not(feature = "sdl2"))]
+    pub fn draw_test_pattern(&mut self) -> Result<(), Sdl2VideoError> {
+        Ok(())
     }
 
     /// Lock the video buffer for direct access
