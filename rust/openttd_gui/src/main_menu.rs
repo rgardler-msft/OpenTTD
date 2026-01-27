@@ -170,7 +170,7 @@ pub fn handle_main_menu_click(widget_id: WidgetID) -> Option<String> {
             Some("OPTIONS".to_string())
         }
         MainMenuWidgets::HIGHSCORE => {
-            println!("Highscore clicked");
+            println!("Highscore clicked - opening highscore window");
             Some("HIGHSCORE".to_string())
         }
         MainMenuWidgets::HELP => {

@@ -64,9 +64,23 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
                     // Handle click and get the clicked widget ID from the active window
                     if window_manager.on_click(x, y, button) {
-                        // Check if we need to get the widget ID that was clicked
-                        // For now we'll handle this through the window manager's internal state
-                        // In a real implementation, we'd need to track which widget was clicked
+                        // Check if any button was clicked and handle special cases
+                        // For now, we handle highscore separately
+                        // In future we'd have better event handling
+
+                        // Check if we need to open highscore window
+                        if let Some(action) = openttd_gui::handle_main_menu_click(
+                            openttd_gui::MainMenuWidgets::HIGHSCORE,
+                        ) {
+                            if action == "HIGHSCORE" {
+                                // Open highscore window
+                                openttd_gui::show_highscore_table(
+                                    &mut window_manager,
+                                    openttd_gui::DifficultyLevel::Custom,
+                                    None,
+                                );
+                            }
+                        }
                     }
                 }
                 Event::MouseButtonUp { .. } => {

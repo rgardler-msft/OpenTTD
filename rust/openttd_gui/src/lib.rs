@@ -3,8 +3,10 @@
 //! This module provides the window and widget system for OpenTTD's graphical user interface.
 //! It handles window management, widget layouts, event routing, and rendering.
 
+mod highscore;
 mod main_menu;
 
+pub use highscore::{draw_highscore_window, show_highscore_table, DifficultyLevel, HighScore};
 pub use main_menu::{create_main_menu_window, handle_main_menu_click, MainMenuWidgets};
 
 use openttd_gfx::{ButtonState, Colour, GfxContext, Rect};

@@ -5,8 +5,6 @@ use sdl2::pixels::Color as SdlColor;
 use sdl2::rect::Rect as SdlRect;
 use sdl2::render::Canvas;
 use sdl2::video::Window;
-use std::collections::HashMap;
-use std::path::Path;
 use thiserror::Error;
 
 #[cfg(feature = "ttf")]
@@ -217,6 +215,14 @@ impl Rect {
             && x < self.x + self.width as i32
             && y >= self.y
             && y < self.y + self.height as i32
+    }
+
+    /// Get the center point of this rectangle
+    pub fn center(&self) -> (i32, i32) {
+        (
+            self.x + (self.width / 2) as i32,
+            self.y + (self.height / 2) as i32,
+        )
     }
 }
 
