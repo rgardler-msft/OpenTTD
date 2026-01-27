@@ -42,4 +42,29 @@ impl SavegameHeader {
             flags,
         })
     }
+
+    /// Write the header to a byte buffer
+    pub fn write(&self) -> Vec<u8> {
+        let mut buf = Vec::with_capacity(8);
+
+        // Write magic bytes based on compression type
+        let magic = match self.compression {
+            CompressionType::Lzo => b"OTTD",
+            CompressionType::None => b"OTTN",
+            CompressionType::Zlib => b"OTTZ",
+            CompressionType::Lzma => b"OTTX",
+        };
+        buf.extend_from_slice(magic);
+
+        // Write version and flags in big-endian
+        buf.extend_from_slice(&self.version.to_be_bytes());
+        buf.extend_from_slice(&self.flags.to_be_bytes());
+
+        buf
+    }
+
+    /// Get the expected header size in bytes
+    pub const fn size() -> usize {
+        8 // 4 bytes magic + 2 bytes version + 2 bytes flags
+    }
 }
