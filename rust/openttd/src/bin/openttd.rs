@@ -144,6 +144,20 @@ fn handle_world_gen_action(window_manager: &mut WindowManager, x: i32, y: i32) -
         return Some("CYCLE_SEA_LEVEL".to_string());
     }
 
+    // Year selector buttons (y: 350-380)
+    if local_y >= 350 && local_y <= 380 {
+        // Down button (x: 180-210)
+        if local_x >= 180 && local_x <= 210 {
+            println!("Year down button clicked");
+            return Some("YEAR_DOWN".to_string());
+        }
+        // Up button (x: 290-320)
+        else if local_x >= 290 && local_x <= 320 {
+            println!("Year up button clicked");
+            return Some("YEAR_UP".to_string());
+        }
+    }
+
     None
 }
 
@@ -308,6 +322,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                             action if action.starts_with("CYCLE_") => {
                                 println!("Cycling dropdown: {}", action);
                                 // TODO: Update the dropdown display with next value in sequence
+                            }
+                            "YEAR_UP" => {
+                                println!("Incrementing start year");
+                                // TODO: Increase year value and update display
+                            }
+                            "YEAR_DOWN" => {
+                                println!("Decrementing start year");
+                                // TODO: Decrease year value and update display
                             }
                             _ => {
                                 println!("World gen action not yet implemented: {}", action);
