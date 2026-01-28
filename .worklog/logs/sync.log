@@ -2600,3 +2600,29 @@ No conflicts detected.
 Sync summary itemsAdded=0 itemsUpdated=0 itemsUnchanged=457
 Sync summary commentsAdded=0 commentsUnchanged=166
 --- sync end 2026-01-28T05:05:25.415Z ---
+--- sync start 2026-01-28T18:46:20.635Z file=/home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl ---
+Options json=undefined verbose=undefined dryRun=false push=true
+Starting sync for /home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl...
+Local state: 458 work items, 169 comments
+Remote state: 458 work items, 169 comments
+Conflict details suppressed (run with --verbose to print).
+No conflicts detected.
+Sync summary itemsAdded=0 itemsUpdated=0 itemsUnchanged=458
+Sync summary commentsAdded=0 commentsUnchanged=169
+--- sync end 2026-01-28T18:46:23.418Z ---
+--- sync start 2026-01-28T18:50:30.322Z file=/home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl ---
+Options json=undefined verbose=undefined dryRun=false push=true
+Starting sync for /home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl...
+Local state: 459 work items, 170 comments
+Remote state: 458 work items, 169 comments
+Conflict details suppressed (run with --verbose to print).
+Conflict details count: 2
+Conflict item=OM-0MKUUVO7I0KRI8G9 title=Vehicle data model type=different-timestamp local=2026-01-28T18:50:24.203Z remote=2026-01-27T22:51:26.079Z
+  field=status chosen=local reason=local is newer (2026-01-28T18:50:24.203Z) local="in_progress" remote="in-progress" chosen="in_progress"
+  field=assignee chosen=local reason=local is newer (2026-01-28T18:50:24.203Z) local="@patch" remote="@ai-agent" chosen="@patch"
+  field=stage chosen=local reason=local is newer (2026-01-28T18:50:24.203Z) local="in_progress" remote="in_review" chosen="in_progress"
+Conflict item=OM-0MKUUWY0N11LUDT5 title=Windowing + SDL2 type=different-timestamp local=2026-01-28T18:46:30.058Z remote=2026-01-27T22:51:26.282Z
+  field=status chosen=local reason=local is newer (2026-01-28T18:46:30.058Z) local="completed" remote="in-progress" chosen="completed"
+Sync summary itemsAdded=0 itemsUpdated=2 itemsUnchanged=457
+Sync summary commentsAdded=0 commentsUnchanged=170
+--- sync end 2026-01-28T18:50:34.233Z ---
