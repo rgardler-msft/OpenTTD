@@ -15,4 +15,5 @@ docs/source/*
 .worklog/worklog.db-shm
 .worklog/worklog.db-wal
 .worklog/worklog-data.jsonl
+.worklog/logs/sync.log
 .worklog/tmp-worktree-*
