@@ -67,6 +67,59 @@ fn handle_main_menu_action(window_manager: &mut WindowManager, x: i32, y: i32) -
     None
 }
 
+/// Handle world generation window button clicks and return the action to perform
+fn handle_world_gen_action(window_manager: &mut WindowManager, x: i32, y: i32) -> Option<String> {
+    // Check if world gen window is present
+    if window_manager
+        .get_window(openttd_gui::WORLD_GEN_WINDOW_ID)
+        .is_none()
+    {
+        return None;
+    }
+
+    // World gen window is centered at (100, 50, 600, 500)
+    let world_gen_rect = openttd_gfx::Rect::new(100, 50, 600, 500);
+    if !world_gen_rect.contains_point(x, y) {
+        return None;
+    }
+
+    // Translate to window coordinates
+    let local_x = x - world_gen_rect.x;
+    let local_y = y - world_gen_rect.y - 20; // Account for title bar
+
+    // Check for Generate and Cancel buttons at bottom (470, 200/300, 80x30)
+    if local_y >= 450 && local_y <= 480 {
+        if local_x >= 180 && local_x <= 260 {
+            // Generate button
+            println!("Generate button clicked");
+            return Some("GENERATE_WORLD".to_string());
+        } else if local_x >= 280 && local_x <= 360 {
+            // Cancel button
+            println!("Cancel button clicked");
+            return Some("CANCEL_WORLD_GEN".to_string());
+        }
+    }
+
+    // Check for climate buttons (y: 30-60, x: 20/170/320/470)
+    if local_y >= 30 && local_y <= 60 {
+        if local_x >= 20 && local_x <= 160 {
+            println!("Temperate climate selected");
+            return Some("CLIMATE_TEMPERATE".to_string());
+        } else if local_x >= 170 && local_x <= 310 {
+            println!("Arctic climate selected");
+            return Some("CLIMATE_ARCTIC".to_string());
+        } else if local_x >= 320 && local_x <= 460 {
+            println!("Tropical climate selected");
+            return Some("CLIMATE_TROPICAL".to_string());
+        } else if local_x >= 470 && local_x <= 560 {
+            println!("Toyland climate selected");
+            return Some("CLIMATE_TOYLAND".to_string());
+        }
+    }
+
+    None
+}
+
 /// Handle toolbar button clicks and return the action to perform
 fn handle_toolbar_action(window_manager: &mut WindowManager, x: i32, y: i32) -> Option<String> {
     // Check if toolbar window is present
@@ -200,6 +253,38 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         continue;
                     }
 
+                    // Check for world generation window button clicks
+                    if let Some(action) = handle_world_gen_action(&mut window_manager, x, y) {
+                        match action.as_str() {
+                            "GENERATE_WORLD" => {
+                                println!("Generating world... (not yet implemented)");
+                                // For now, just close the window and show toolbar
+                                let _ =
+                                    window_manager.remove_window(openttd_gui::WORLD_GEN_WINDOW_ID);
+                                openttd_gui::show_toolbar(&mut window_manager, 800);
+                            }
+                            "CANCEL_WORLD_GEN" => {
+                                println!("Canceling world generation");
+                                // Close world gen window and return to main menu
+                                let _ =
+                                    window_manager.remove_window(openttd_gui::WORLD_GEN_WINDOW_ID);
+                                if let Some(main_menu) =
+                                    window_manager.get_window(openttd_gui::MainMenuWidgets::WINDOW)
+                                {
+                                    main_menu.visible = true;
+                                }
+                            }
+                            action if action.starts_with("CLIMATE_") => {
+                                println!("Climate selection: {}", action);
+                                // TODO: Update the world gen config with selected climate
+                            }
+                            _ => {
+                                println!("World gen action not yet implemented: {}", action);
+                            }
+                        }
+                        continue;
+                    }
+
                     // Check for toolbar button clicks first (if toolbar is visible)
                     if let Some(action) = handle_toolbar_action(&mut window_manager, x, y) {
                         match action.as_str() {
@@ -257,15 +342,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                                 );
                             }
                             "NEW_GAME" => {
-                                println!("Starting new game - showing toolbar");
+                                println!("Starting new game - showing world generation window");
                                 // Hide main menu
                                 if let Some(main_menu) =
                                     window_manager.get_window(openttd_gui::MainMenuWidgets::WINDOW)
                                 {
                                     main_menu.visible = false;
                                 }
-                                // Show toolbar
-                                openttd_gui::show_toolbar(&mut window_manager, 800);
+                                // Show world generation window
+                                openttd_gui::show_world_gen(&mut window_manager);
                             }
                             "LOAD_GAME" => {
                                 println!("Load Game - not yet implemented");
@@ -340,6 +425,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         .is_some()
                     {
                         let _ = window_manager.remove_window(openttd_gui::LEAGUE_WINDOW_ID);
+                        continue;
+                    }
+
+                    if window_manager
+                        .get_window(openttd_gui::WORLD_GEN_WINDOW_ID)
+                        .is_some()
+                    {
+                        let _ = window_manager.remove_window(openttd_gui::WORLD_GEN_WINDOW_ID);
+                        // Return to main menu
+                        if let Some(main_menu) =
+                            window_manager.get_window(openttd_gui::MainMenuWidgets::WINDOW)
+                        {
+                            main_menu.visible = true;
+                        }
                         continue;
                     }
 
