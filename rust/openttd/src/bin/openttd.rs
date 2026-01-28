@@ -117,6 +117,33 @@ fn handle_world_gen_action(window_manager: &mut WindowManager, x: i32, y: i32) -
         }
     }
 
+    // Check for map size, terrain type, and other dropdown button clicks
+    // For now, these will cycle through options when clicked
+
+    // Map size X button (y: 100-130, x: 180-260)
+    if local_y >= 100 && local_y <= 130 && local_x >= 180 && local_x <= 260 {
+        println!("Map size X button clicked - cycling through sizes");
+        return Some("CYCLE_MAP_SIZE_X".to_string());
+    }
+
+    // Map size Y button (y: 100-130, x: 430-510)
+    if local_y >= 100 && local_y <= 130 && local_x >= 430 && local_x <= 510 {
+        println!("Map size Y button clicked - cycling through sizes");
+        return Some("CYCLE_MAP_SIZE_Y".to_string());
+    }
+
+    // Terrain type button (y: 150-180, x: 180-360)
+    if local_y >= 150 && local_y <= 180 && local_x >= 180 && local_x <= 360 {
+        println!("Terrain type button clicked - cycling through types");
+        return Some("CYCLE_TERRAIN_TYPE".to_string());
+    }
+
+    // Sea level button (y: 200-230, x: 180-360)
+    if local_y >= 200 && local_y <= 230 && local_x >= 180 && local_x <= 360 {
+        println!("Sea level button clicked - cycling through levels");
+        return Some("CYCLE_SEA_LEVEL".to_string());
+    }
+
     None
 }
 
@@ -277,6 +304,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                             action if action.starts_with("CLIMATE_") => {
                                 println!("Climate selection: {}", action);
                                 // TODO: Update the world gen config with selected climate
+                            }
+                            action if action.starts_with("CYCLE_") => {
+                                println!("Cycling dropdown: {}", action);
+                                // TODO: Update the dropdown display with next value in sequence
                             }
                             _ => {
                                 println!("World gen action not yet implemented: {}", action);

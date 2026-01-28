@@ -2580,3 +2580,23 @@ No conflicts detected.
 Sync summary itemsAdded=0 itemsUpdated=0 itemsUnchanged=456
 Sync summary commentsAdded=0 commentsUnchanged=163
 --- sync end 2026-01-27T22:54:30.780Z ---
+--- sync start 2026-01-28T03:05:13.655Z file=/home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl ---
+Options json=undefined verbose=undefined dryRun=false push=true
+Starting sync for /home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl...
+Local state: 456 work items, 166 comments
+Remote state: 456 work items, 166 comments
+Conflict details suppressed (run with --verbose to print).
+No conflicts detected.
+Sync summary itemsAdded=0 itemsUpdated=0 itemsUnchanged=456
+Sync summary commentsAdded=0 commentsUnchanged=166
+--- sync end 2026-01-28T03:05:16.521Z ---
+--- sync start 2026-01-28T05:05:21.070Z file=/home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl ---
+Options json=undefined verbose=undefined dryRun=false push=true
+Starting sync for /home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl...
+Local state: 457 work items, 166 comments
+Remote state: 456 work items, 166 comments
+Conflict details suppressed (run with --verbose to print).
+No conflicts detected.
+Sync summary itemsAdded=0 itemsUpdated=0 itemsUnchanged=457
+Sync summary commentsAdded=0 commentsUnchanged=166
+--- sync end 2026-01-28T05:05:25.415Z ---
