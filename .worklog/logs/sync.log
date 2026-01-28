@@ -2610,3 +2610,17 @@ No conflicts detected.
 Sync summary itemsAdded=0 itemsUpdated=0 itemsUnchanged=461
 Sync summary commentsAdded=0 commentsUnchanged=171
 --- sync end 2026-01-28T19:08:48.781Z ---
+--- sync start 2026-01-28T19:10:49.591Z file=/home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl ---
+Options json=undefined verbose=undefined dryRun=false push=true
+Starting sync for /home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl...
+Local state: 461 work items, 173 comments
+Remote state: 461 work items, 171 comments
+Conflict details suppressed (run with --verbose to print).
+Conflict details count: 2
+Conflict item=OM-0MKUUWY0N11LUDT5 title=Windowing + SDL2 type=different-timestamp local=2026-01-28T19:09:23.423Z remote=2026-01-28T18:46:30.058Z
+  field=status chosen=local reason=local is newer (2026-01-28T19:09:23.423Z) local="closed" remote="completed" chosen="closed"
+Conflict item=OM-0MKUV7BYW15HZWRH title=Header read/write type=different-timestamp local=2026-01-28T19:09:24.023Z remote=2026-01-27T22:51:26.509Z
+  field=status chosen=local reason=local is newer (2026-01-28T19:09:24.023Z) local="closed" remote="in-progress" chosen="closed"
+Sync summary itemsAdded=0 itemsUpdated=2 itemsUnchanged=459
+Sync summary commentsAdded=0 commentsUnchanged=173
+--- sync end 2026-01-28T19:10:53.569Z ---
