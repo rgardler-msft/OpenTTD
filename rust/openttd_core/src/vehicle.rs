@@ -459,6 +459,17 @@ pub struct TrainCache {
 }
 
 /// Train-specific data fields
+///
+/// Field parity with C++ `Train` (src/train.h):
+/// - `flags` -> `Train::flags`
+/// - `crash_anim_pos` -> `Train::crash_anim_pos`
+/// - `wait_counter` -> `Train::wait_counter`
+/// - `tcache` -> `Train::tcache`
+/// - `other_multiheaded_part` -> `Train::other_multiheaded_part`
+/// - `compatible_railtypes` -> `Train::compatible_railtypes`
+/// - `railtypes` -> `Train::railtypes`
+/// - `track` -> `Train::track`
+/// - `force_proceed` -> `Train::force_proceed`
 #[repr(C)]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TrainData {
@@ -506,6 +517,19 @@ pub struct RoadVehPathElement {
 }
 
 /// Road vehicle-specific data fields
+///
+/// Field parity with C++ `RoadVehicle` (src/roadveh.h):
+/// - `path` -> `RoadVehicle::path`
+/// - `state` -> `RoadVehicle::state`
+/// - `frame` -> `RoadVehicle::frame`
+/// - `blocked_ctr` -> `RoadVehicle::blocked_ctr`
+/// - `overtaking` -> `RoadVehicle::overtaking`
+/// - `overtaking_ctr` -> `RoadVehicle::overtaking_ctr`
+/// - `crashed_ctr` -> `RoadVehicle::crashed_ctr`
+/// - `reverse_ctr` -> `RoadVehicle::reverse_ctr`
+/// - `roadtype` -> `RoadVehicle::roadtype` (NOSAVE in C++)
+/// - `disaster_vehicle` -> `RoadVehicle::disaster_vehicle` (NOSAVE in C++)
+/// - `compatible_roadtypes` -> `RoadVehicle::compatible_roadtypes` (NOSAVE in C++)
 #[repr(C)]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RoadVehicleData {
@@ -548,6 +572,13 @@ pub struct ShipPathElement {
 }
 
 /// Ship-specific data fields
+///
+/// Field parity with C++ `Ship` (src/ship.h):
+/// - `path` -> `Ship::path`
+/// - `state` -> `Ship::state`
+/// - `rotation` -> `Ship::rotation`
+/// - `rotation_x_pos` -> `Ship::rotation_x_pos` (NOSAVE in C++)
+/// - `rotation_y_pos` -> `Ship::rotation_y_pos` (NOSAVE in C++)
 #[repr(C)]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ShipData {
@@ -600,6 +631,18 @@ pub struct AircraftCache {
 }
 
 /// Aircraft-specific data fields
+///
+/// Field parity with C++ `Aircraft` (src/aircraft.h):
+/// - `crashed_counter` -> `Aircraft::crashed_counter`
+/// - `pos` -> `Aircraft::pos`
+/// - `previous_pos` -> `Aircraft::previous_pos`
+/// - `targetairport` -> `Aircraft::targetairport`
+/// - `state` -> `Aircraft::state`
+/// - `last_direction` -> `Aircraft::last_direction`
+/// - `number_consecutive_turns` -> `Aircraft::number_consecutive_turns`
+/// - `turn_counter` -> `Aircraft::turn_counter`
+/// - `flags` -> `Aircraft::flags`
+/// - `acache` -> `Aircraft::acache`
 #[repr(C)]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AircraftData {
