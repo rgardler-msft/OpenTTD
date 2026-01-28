@@ -2626,3 +2626,25 @@ Conflict item=OM-0MKUUWY0N11LUDT5 title=Windowing + SDL2 type=different-timestam
 Sync summary itemsAdded=0 itemsUpdated=2 itemsUnchanged=457
 Sync summary commentsAdded=0 commentsUnchanged=170
 --- sync end 2026-01-28T18:50:34.233Z ---
+--- sync start 2026-01-28T19:07:16.544Z file=/home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl ---
+Options json=undefined verbose=undefined dryRun=false push=true
+Starting sync for /home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl...
+Local state: 461 work items, 170 comments
+Remote state: 459 work items, 170 comments
+Conflict details suppressed (run with --verbose to print).
+No conflicts detected.
+Sync summary itemsAdded=0 itemsUpdated=0 itemsUnchanged=461
+Sync summary commentsAdded=0 commentsUnchanged=170
+--- sync end 2026-01-28T19:07:20.553Z ---
+--- sync start 2026-01-28T19:08:09.817Z file=/home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl ---
+Options json=undefined verbose=undefined dryRun=false push=true
+Starting sync for /home/rogardle/projects/OpenTTD-Migration/.worklog/worklog-data.jsonl...
+Local state: 461 work items, 171 comments
+Remote state: 461 work items, 170 comments
+Conflict details suppressed (run with --verbose to print).
+Conflict details count: 1
+Conflict item=OM-0MKUUVO7I0KRI8G9 title=Vehicle data model type=different-timestamp local=2026-01-28T19:07:51.329Z remote=2026-01-28T18:50:24.203Z
+  field=stage chosen=local reason=local is newer (2026-01-28T19:07:51.329Z) local="in_review" remote="in_progress" chosen="in_review"
+Sync summary itemsAdded=0 itemsUpdated=1 itemsUnchanged=460
+Sync summary commentsAdded=0 commentsUnchanged=171
+--- sync end 2026-01-28T19:08:13.527Z ---
