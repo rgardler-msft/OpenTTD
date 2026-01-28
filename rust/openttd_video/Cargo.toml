@@ -2,6 +2,7 @@
 name = "openttd_video"
 version = "0.1.0"
 edition = "2021"
+license = "GPL-2.0-only"
 
 [dependencies]
 openttd_core = { path = "../openttd_core" }
@@ -10,8 +11,10 @@ thiserror = "1.0"
 log = "0.4"
 
 [features]
-default = ["sdl2-backend"]
+default = ["stub"]
+stub = []
 sdl2-backend = ["sdl2"]
+sdl2 = ["dep:sdl2"]
 
 [dev-dependencies]
 env_logger = "0.11"

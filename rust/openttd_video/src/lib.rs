@@ -8,6 +8,10 @@ pub mod event;
 #[cfg(feature = "sdl2-backend")]
 pub mod sdl2_driver;
 
+// Additional modules from SDL2 windowing branch
+pub mod sdl2;
+pub mod software;
+
 #[cfg(test)]
 mod tests;
 
