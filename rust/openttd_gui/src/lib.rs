@@ -8,6 +8,7 @@ mod highscore;
 mod league;
 mod main_menu;
 mod main_menu_window;
+mod settings_graphics;
 mod toolbar;
 mod world_gen;
 
@@ -23,6 +24,10 @@ pub use league::{
 };
 pub use main_menu::{create_main_menu_window, handle_main_menu_click, MainMenuWidgets};
 pub use main_menu_window::{show_main_menu, MainMenuWindow};
+pub use settings_graphics::{
+    show_graphics_settings, GraphicsSettingsAction, GraphicsSettingsWindow,
+    GRAPHICS_SETTINGS_WINDOW_ID,
+};
 pub use toolbar::{show_toolbar, ToolbarWindow, TOOLBAR_WINDOW_ID};
 pub use world_gen::{show_world_gen, WorldGenWindow, WORLD_GEN_WINDOW_ID};
 
@@ -323,7 +328,7 @@ impl Widget for ButtonWidget {
         if !self.base.enabled || !self.base.visible {
             return false;
         }
-        if !self.contains_point(x, y) {
+        if !self.base.rect.contains_point(x, y) {
             return false;
         }
 
@@ -914,6 +919,7 @@ impl WindowManager {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::settings_graphics::{GraphicsSettingsWidgets, GraphicsSettingsWindow};
 
     #[test]
     fn test_widget_base() {
@@ -984,5 +990,29 @@ mod tests {
         let size = container.calculate_size();
         assert!(size.min_width > 0);
         assert!(size.min_height > 0);
+    }
+
+    #[test]
+    fn test_graphics_settings_toggle_and_dropdown() {
+        let mut window = GraphicsSettingsWindow::new();
+        let rect = Rect::new(140, 80, 520, 420);
+
+        let fullscreen_click = GraphicsSettingsWindow::fullscreen_rect();
+        assert!(window
+            .handle_click(fullscreen_click.x + 1, fullscreen_click.y + 1, rect)
+            .is_some());
+        assert!(window.fullscreen_enabled());
+
+        let resolution_click = GraphicsSettingsWindow::resolution_rect();
+        assert!(window
+            .handle_click(resolution_click.x + 1, resolution_click.y + 1, rect)
+            .is_some());
+    }
+
+    #[test]
+    fn test_graphics_settings_window_contains_widgets() {
+        let window = GraphicsSettingsWindow::new().build_window();
+        assert_eq!(window.id, GraphicsSettingsWidgets::Window as WidgetID);
+        assert_eq!(window.title, "Graphics Settings");
     }
 }

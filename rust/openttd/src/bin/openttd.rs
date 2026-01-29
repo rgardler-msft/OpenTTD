@@ -4,7 +4,7 @@
 //! Currently implements the main menu as a starting point for the Rust migration.
 
 use openttd_gfx::GfxContext;
-use openttd_gui::{MainMenuWindow, WindowManager};
+use openttd_gui::{GraphicsSettingsAction, GraphicsSettingsWindow, MainMenuWindow, WindowManager};
 use openttd_video::{event::Event, Sdl2Driver};
 use sdl2::mouse::MouseButton;
 use std::time::Duration;
@@ -22,9 +22,6 @@ fn handle_main_menu_action(window_manager: &mut WindowManager, x: i32, y: i32) -
     // Use the original main menu click handler for now
     // In the future we'll refactor to have better event handling
 
-    // Check which widget was clicked based on position
-    // This is a temporary solution until we have proper widget click detection
-
     let main_menu_rect = openttd_gfx::Rect::new(200, 100, 400, 520);
     if !main_menu_rect.contains_point(x, y) {
         return None;
@@ -34,37 +31,50 @@ fn handle_main_menu_action(window_manager: &mut WindowManager, x: i32, y: i32) -
     let local_x = x - main_menu_rect.x;
     let local_y = y - main_menu_rect.y - 20; // Account for title bar
 
-    // Check if within button x range (padding 20, button width 340)
-    if local_x < 20 || local_x > 360 {
+    let padding = 20;
+    let spacing = 10;
+    let child_count = 20;
+    let content_height = main_menu_rect.height as i32 - 20;
+    let available_height = content_height - 2 * padding;
+    let child_height = (available_height - (child_count - 1) * spacing) / child_count;
+    let stride = child_height + spacing;
+
+    if local_x < padding || local_x > (main_menu_rect.width as i32 - padding) {
         return None;
     }
 
-    // Calculate which button based on y position
-    // Layout: title(30) + spacing(10) + label(20) = 60 pixels before first button
-    // Then buttons are 30 pixels high with 10 pixel spacing
-
-    let button_areas = vec![
-        (60, 90, "NEW_GAME"),           // New Game
-        (100, 130, "LOAD_GAME"),        // Load Game
-        (140, 170, "PLAY_SCENARIO"),    // Play Scenario
-        (180, 210, "PLAY_HEIGHTMAP"),   // Play Heightmap
-        (220, 250, "SCENARIO_EDITOR"),  // Scenario Editor
-        (260, 290, "HIGHSCORE"),        // Highscore
-        (320, 350, "MULTIPLAYER"),      // Multiplayer (after spacer and label)
-        (390, 420, "OPTIONS"),          // Options (after spacer and label)
-        (430, 460, "CONTENT_DOWNLOAD"), // Content Download
-        (470, 500, "HELP"),             // Help
-        (530, 560, "EXIT_APPLICATION"), // Exit (after spacer)
-    ];
-
-    for (y_min, y_max, action) in button_areas {
-        if local_y >= y_min && local_y <= y_max {
-            println!("Main menu button clicked: {}", action);
-            return Some(action.to_string());
-        }
+    let y_in_container = local_y - padding;
+    if y_in_container < 0 {
+        return None;
     }
 
-    None
+    let index = y_in_container / stride;
+    if index < 0 || index >= child_count {
+        return None;
+    }
+
+    let offset_in_stride = y_in_container % stride;
+    if offset_in_stride >= child_height {
+        return None;
+    }
+
+    let action = match index {
+        2 => "NEW_GAME",
+        3 => "LOAD_GAME",
+        4 => "PLAY_SCENARIO",
+        5 => "PLAY_HEIGHTMAP",
+        6 => "SCENARIO_EDITOR",
+        7 => "HIGHSCORE",
+        10 => "MULTIPLAYER",
+        13 => "OPTIONS",
+        14 => "CONTENT_DOWNLOAD",
+        15 => "HELP",
+        17 => "EXIT_APPLICATION",
+        _ => return None,
+    };
+
+    println!("Main menu button clicked: {}", action);
+    Some(action.to_string())
 }
 
 /// Handle world generation window button clicks and return the action to perform
@@ -251,6 +261,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Main game loop
     let mut running = true;
     let mut last_frame = std::time::Instant::now();
+    let mut graphics_settings: Option<GraphicsSettingsWindow> = None;
 
     while running {
         // Calculate delta time
@@ -431,8 +442,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                                 // TODO: Implement multiplayer browser
                             }
                             "OPTIONS" => {
-                                println!("Options - not yet implemented");
-                                // TODO: Implement options window
+                                println!("Opening graphics settings window");
+                                let settings = GraphicsSettingsWindow::new();
+                                openttd_gui::show_graphics_settings(&mut window_manager, &settings);
+                                graphics_settings = Some(settings);
                             }
                             "HELP" => {
                                 println!("Help - not yet implemented");
@@ -450,6 +463,29 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         // Let window manager handle other clicks
                         let button = MouseButton::Left;
                         let _ = window_manager.on_click(x, y, button);
+
+                        if let Some(window_rect) = window_manager
+                            .get_window(openttd_gui::GRAPHICS_SETTINGS_WINDOW_ID)
+                            .map(|window| window.rect)
+                        {
+                            if let Some(ref mut settings) = graphics_settings {
+                                if let Some(action) = settings.handle_click(x, y, window_rect) {
+                                    if matches!(action, GraphicsSettingsAction::Close) {
+                                        let _ = window_manager.remove_window(
+                                            openttd_gui::GRAPHICS_SETTINGS_WINDOW_ID,
+                                        );
+                                        graphics_settings = None;
+                                    } else if matches!(action, GraphicsSettingsAction::None) {
+                                        let refreshed = settings.build_window();
+                                        let _ = window_manager.remove_window(
+                                            openttd_gui::GRAPHICS_SETTINGS_WINDOW_ID,
+                                        );
+                                        window_manager.add_window(refreshed);
+                                    }
+                                    continue;
+                                }
+                            }
+                        }
                     }
                 }
                 Event::MouseButtonUp { .. } => {
@@ -457,6 +493,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
                 Event::KeyDown { keycode, .. } => {
                     // Close any open dialog windows on ESC or any keypress
+                    if window_manager
+                        .get_window(openttd_gui::GRAPHICS_SETTINGS_WINDOW_ID)
+                        .is_some()
+                    {
+                        let _ =
+                            window_manager.remove_window(openttd_gui::GRAPHICS_SETTINGS_WINDOW_ID);
+                        graphics_settings = None;
+                        continue;
+                    }
+
                     if window_manager
                         .get_window(openttd_gui::HIGHSCORE_WINDOW_ID)
                         .is_some()
