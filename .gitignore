@@ -17,3 +17,21 @@ docs/source/*
 .worklog/worklog-data.jsonl
 .worklog/logs/sync.log
 .worklog/tmp-worktree-*
+.worklog/tui-state.json
+
+##################################
+Worklog Specific Ignores
+##################################
+
+# Ignore Worklog directory by default
+.worklog/
+
+# Keep defaults and plugins tracked
+!.worklog/config.defaults.yaml
+!.worklog/plugins/
+!.worklog/plugins/**
+
+# opencode temporary files
+.opencode/tmp/
+
+### End of Worklog Specific Ignores
