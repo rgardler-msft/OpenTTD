@@ -65,6 +65,7 @@ pub enum GraphicsSettingsAction {
     None,
     Close,
     OpenAudio,
+    OpenGameplay,
 }
 
 const WINDOW_X: i32 = 140;
@@ -126,6 +127,7 @@ impl GraphicsSettingsWindow {
         tabs.add_child(Box::new(
             LabelWidget::new(7098, "Video").with_colour(openttd_gfx::Colour::ui_highlight()),
         ));
+        tabs.add_child(Box::new(ButtonWidget::new(7096, "Gameplay")));
         main_container.add_child(Box::new(tabs));
 
         // Display section
@@ -227,10 +229,14 @@ impl GraphicsSettingsWindow {
             return Some(GraphicsSettingsAction::Close);
         }
 
-        let audio_tab_rect = Rect::new(rect.x + 12, rect.y + TITLE_BAR_HEIGHT, 120, 24);
-        if audio_tab_rect.contains_point(x, y) {
+        let tab_rects = tab_button_rects();
+        if tab_rects[0].contains_point(x, y) {
             println!("Switching to audio tab");
             return Some(GraphicsSettingsAction::OpenAudio);
+        }
+        if tab_rects[2].contains_point(x, y) {
+            println!("Switching to gameplay tab");
+            return Some(GraphicsSettingsAction::OpenGameplay);
         }
 
         if resolution_rect().contains_point(x, y) {
@@ -427,6 +433,31 @@ fn action_button_at(x: i32, y: i32) -> Option<GraphicsSettingsWidgets> {
     }
 }
 
+fn tab_button_rects() -> [Rect; 3] {
+    let bar_rect = Rect::new(
+        WINDOW_X + 12,
+        WINDOW_Y + TITLE_BAR_HEIGHT,
+        WINDOW_WIDTH - 24,
+        24,
+    );
+    let spacing = 6;
+    let button_width = (bar_rect.width as i32 - 2 * spacing) / 3;
+    let audio_rect = Rect::new(bar_rect.x, bar_rect.y, button_width as u32, bar_rect.height);
+    let video_rect = Rect::new(
+        bar_rect.x + button_width + spacing,
+        bar_rect.y,
+        button_width as u32,
+        bar_rect.height,
+    );
+    let gameplay_rect = Rect::new(
+        bar_rect.x + 2 * (button_width + spacing),
+        bar_rect.y,
+        button_width as u32,
+        bar_rect.height,
+    );
+    [audio_rect, video_rect, gameplay_rect]
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -435,8 +466,17 @@ mod tests {
     fn test_graphics_settings_switch_to_audio() {
         let mut window = GraphicsSettingsWindow::new();
         let rect = Rect::new(WINDOW_X, WINDOW_Y, WINDOW_WIDTH, WINDOW_HEIGHT);
-        let audio_tab_rect = Rect::new(rect.x + 12, rect.y + TITLE_BAR_HEIGHT, 120, 24);
-        let action = window.handle_click(audio_tab_rect.x + 1, audio_tab_rect.y + 1, rect);
+        let tab_rects = tab_button_rects();
+        let action = window.handle_click(tab_rects[0].x + 1, tab_rects[0].y + 1, rect);
         assert!(matches!(action, Some(GraphicsSettingsAction::OpenAudio)));
+    }
+
+    #[test]
+    fn test_graphics_settings_switch_to_gameplay() {
+        let mut window = GraphicsSettingsWindow::new();
+        let rect = Rect::new(WINDOW_X, WINDOW_Y, WINDOW_WIDTH, WINDOW_HEIGHT);
+        let tab_rects = tab_button_rects();
+        let action = window.handle_click(tab_rects[2].x + 1, tab_rects[2].y + 1, rect);
+        assert!(matches!(action, Some(GraphicsSettingsAction::OpenGameplay)));
     }
 }
