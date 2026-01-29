@@ -4,7 +4,7 @@
 //! Currently implements the main menu as a starting point for the Rust migration.
 
 use openttd_gfx::GfxContext;
-use openttd_gui::{MainMenuWindow, WindowManager};
+use openttd_gui::{GraphicsSettingsWindow, MainMenuWindow, WindowManager};
 use openttd_video::{event::Event, Sdl2Driver};
 use sdl2::mouse::MouseButton;
 use std::time::Duration;
@@ -251,6 +251,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Main game loop
     let mut running = true;
     let mut last_frame = std::time::Instant::now();
+    let mut graphics_settings: Option<GraphicsSettingsWindow> = None;
 
     while running {
         // Calculate delta time
@@ -269,6 +270,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     window_manager.on_mouse_move(x, y);
                 }
                 Event::MouseButtonDown { x, y, .. } => {
+                    if let Some(window_rect) = window_manager
+                        .get_window(openttd_gui::GRAPHICS_SETTINGS_WINDOW_ID)
+                        .map(|window| window.rect)
+                    {
+                        if let Some(ref mut settings) = graphics_settings {
+                            if settings.handle_click(x, y, window_rect) {
+                                continue;
+                            }
+                        }
+                    }
+
                     // Check if any special windows are open and close them
                     if window_manager
                         .get_window(openttd_gui::HIGHSCORE_WINDOW_ID)
@@ -431,8 +443,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                                 // TODO: Implement multiplayer browser
                             }
                             "OPTIONS" => {
-                                println!("Options - not yet implemented");
-                                // TODO: Implement options window
+                                println!("Opening graphics settings window");
+                                openttd_gui::show_graphics_settings(&mut window_manager);
+                                graphics_settings = Some(GraphicsSettingsWindow::new());
                             }
                             "HELP" => {
                                 println!("Help - not yet implemented");
@@ -457,6 +470,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
                 Event::KeyDown { keycode, .. } => {
                     // Close any open dialog windows on ESC or any keypress
+                    if window_manager
+                        .get_window(openttd_gui::GRAPHICS_SETTINGS_WINDOW_ID)
+                        .is_some()
+                    {
+                        let _ =
+                            window_manager.remove_window(openttd_gui::GRAPHICS_SETTINGS_WINDOW_ID);
+                        graphics_settings = None;
+                        continue;
+                    }
+
                     if window_manager
                         .get_window(openttd_gui::HIGHSCORE_WINDOW_ID)
                         .is_some()
