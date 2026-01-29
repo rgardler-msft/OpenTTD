@@ -9,6 +9,7 @@ mod league;
 mod main_menu;
 mod main_menu_window;
 mod settings_audio;
+mod settings_gameplay;
 mod settings_graphics;
 mod toolbar;
 mod world_gen;
@@ -27,6 +28,10 @@ pub use main_menu::{create_main_menu_window, handle_main_menu_click, MainMenuWid
 pub use main_menu_window::{show_main_menu, MainMenuWindow};
 pub use settings_audio::{
     show_audio_settings, AudioSettingsAction, AudioSettingsWindow, AUDIO_SETTINGS_WINDOW_ID,
+};
+pub use settings_gameplay::{
+    show_gameplay_settings, GameplaySettingsAction, GameplaySettingsWindow,
+    GAMEPLAY_SETTINGS_WINDOW_ID,
 };
 pub use settings_graphics::{
     show_graphics_settings, GraphicsSettingsAction, GraphicsSettingsWindow,

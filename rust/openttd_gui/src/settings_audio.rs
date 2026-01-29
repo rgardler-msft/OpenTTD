@@ -14,6 +14,7 @@ pub enum AudioSettingsWidgets {
     TabsContainer = 7201,
     VideoTab = 7202,
     AudioTab = 7203,
+    GameplayTab = 7204,
     MusicSectionLabel = 7210,
     MusicToggle = 7211,
     MusicVolume = 7212,
@@ -53,6 +54,7 @@ pub enum AudioSettingsAction {
     None,
     Close,
     OpenVideo,
+    OpenGameplay,
 }
 
 const WINDOW_X: i32 = 140;
@@ -115,6 +117,10 @@ impl AudioSettingsWindow {
         tabs.add_child(Box::new(ButtonWidget::new(
             AudioSettingsWidgets::VideoTab as WidgetID,
             "Video",
+        )));
+        tabs.add_child(Box::new(ButtonWidget::new(
+            AudioSettingsWidgets::GameplayTab as WidgetID,
+            "Gameplay",
         )));
         main_container.add_child(Box::new(tabs));
 
@@ -198,6 +204,10 @@ impl AudioSettingsWindow {
         if tab_rects[1].contains_point(x, y) {
             println!("Switching to video tab");
             return Some(AudioSettingsAction::OpenVideo);
+        }
+        if tab_rects[2].contains_point(x, y) {
+            println!("Switching to gameplay tab");
+            return Some(AudioSettingsAction::OpenGameplay);
         }
 
         if music_toggle_rect().contains_point(x, y) {
@@ -313,7 +323,7 @@ fn layout_vertical_children(parent: Rect, count: i32) -> Vec<Rect> {
     rects
 }
 
-fn tab_button_rects() -> [Rect; 2] {
+fn tab_button_rects() -> [Rect; 3] {
     let bar_rect = Rect::new(
         WINDOW_X + 12,
         WINDOW_Y + TITLE_BAR_HEIGHT,
@@ -321,7 +331,7 @@ fn tab_button_rects() -> [Rect; 2] {
         TAB_BAR_HEIGHT as u32,
     );
     let spacing = 6;
-    let button_width = (bar_rect.width as i32 - spacing) / 2;
+    let button_width = (bar_rect.width as i32 - 2 * spacing) / 3;
     let audio_rect = Rect::new(bar_rect.x, bar_rect.y, button_width as u32, bar_rect.height);
     let video_rect = Rect::new(
         bar_rect.x + button_width + spacing,
@@ -329,7 +339,13 @@ fn tab_button_rects() -> [Rect; 2] {
         button_width as u32,
         bar_rect.height,
     );
-    [audio_rect, video_rect]
+    let gameplay_rect = Rect::new(
+        bar_rect.x + 2 * (button_width + spacing),
+        bar_rect.y,
+        button_width as u32,
+        bar_rect.height,
+    );
+    [audio_rect, video_rect, gameplay_rect]
 }
 
 fn music_toggle_rect() -> Rect {
@@ -425,5 +441,14 @@ mod tests {
         let window = AudioSettingsWindow::new().build_window();
         assert_eq!(window.id, AudioSettingsWidgets::Window as WidgetID);
         assert_eq!(window.title, "Audio Settings");
+    }
+
+    #[test]
+    fn test_audio_settings_switch_to_gameplay() {
+        let mut window = AudioSettingsWindow::new();
+        let rect = Rect::new(WINDOW_X, WINDOW_Y, WINDOW_WIDTH, WINDOW_HEIGHT);
+        let tab_rects = tab_button_rects();
+        let action = window.handle_click(tab_rects[2].x + 1, tab_rects[2].y + 1, rect);
+        assert!(matches!(action, Some(AudioSettingsAction::OpenGameplay)));
     }
 }
