@@ -2,7 +2,8 @@
 //!
 //! Run with: cargo run --example window_modes -p openttd_video
 
-use openttd_video::{Event, Sdl2Driver, WindowEvent, WindowMode};
+use openttd_video::sdl2_driver::WindowMode;
+use openttd_video::{Event, Sdl2Driver, WindowEvent};
 use std::time::Duration;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {

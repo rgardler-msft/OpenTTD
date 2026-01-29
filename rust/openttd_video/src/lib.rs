@@ -10,15 +10,17 @@ pub mod sdl2_driver;
 
 // Additional modules from SDL2 windowing branch
 pub mod sdl2;
+#[cfg(feature = "sdl2")]
 pub mod software;
 
 #[cfg(test)]
 mod tests;
 
 pub use event::{Event, KeyModifiers, MouseButton, Result, VideoError, WindowEvent};
+pub use sdl2::WindowMode;
 
 #[cfg(feature = "sdl2-backend")]
-pub use sdl2_driver::{Resolution, Sdl2Driver, WindowMode};
+pub use sdl2_driver::{Resolution, Sdl2Driver};
 
 /// Video driver trait that all backends must implement
 pub trait VideoDriver {
@@ -64,6 +66,10 @@ impl VideoDriver for Sdl2Driver {
     }
 
     fn set_window_mode(&mut self, mode: WindowMode) -> Result<()> {
+        let mode = match mode {
+            WindowMode::Windowed => sdl2_driver::WindowMode::Windowed,
+            WindowMode::Fullscreen => sdl2_driver::WindowMode::Fullscreen,
+        };
         self.set_window_mode(mode)
     }
 }

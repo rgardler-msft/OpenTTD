@@ -2,7 +2,8 @@
 
 #[cfg(all(test, feature = "sdl2-backend"))]
 mod window_mode_tests {
-    use openttd_video::{Resolution, Sdl2Driver, WindowMode};
+    use openttd_video::sdl2_driver::WindowMode;
+    use openttd_video::{Resolution, Sdl2Driver};
 
     #[test]
     fn test_resolution_struct() {

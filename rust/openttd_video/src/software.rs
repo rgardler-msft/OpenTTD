@@ -2,11 +2,15 @@
 ///
 /// This module implements a software-based rendering backend that uses SDL2's
 /// surface blitting capabilities for drawing to the screen.
+#[cfg(feature = "sdl2")]
 use sdl2::pixels::{Color, PixelFormatEnum};
+#[cfg(feature = "sdl2")]
 use sdl2::rect::Rect;
+#[cfg(feature = "sdl2")]
 use sdl2::surface::Surface;
 
 /// Represents a dirty rectangle that needs to be redrawn
+#[cfg(feature = "sdl2")]
 #[derive(Debug, Clone, Copy, Default)]
 pub struct DirtyRect {
     pub left: i32,
@@ -15,6 +19,7 @@ pub struct DirtyRect {
     pub bottom: i32,
 }
 
+#[cfg(feature = "sdl2")]
 impl DirtyRect {
     /// Check if the rectangle is empty
     pub fn is_empty(&self) -> bool {
@@ -57,12 +62,14 @@ impl DirtyRect {
 }
 
 /// Palette management for 8-bit color modes
+#[cfg(feature = "sdl2")]
 pub struct Palette {
     pub colors: Vec<Color>,
     pub first_dirty: usize,
     pub count_dirty: usize,
 }
 
+#[cfg(feature = "sdl2")]
 impl Default for Palette {
     fn default() -> Self {
         // Initialize with a basic 256-color palette
@@ -79,6 +86,7 @@ impl Default for Palette {
     }
 }
 
+#[cfg(feature = "sdl2")]
 impl Palette {
     /// Mark a range of palette entries as dirty
     pub fn mark_dirty(&mut self, first: usize, count: usize) {
@@ -109,6 +117,7 @@ impl Palette {
 }
 
 /// Software rendering backend
+#[cfg(feature = "sdl2")]
 pub struct SoftwareRenderer {
     pub rgb_surface: Option<Surface<'static>>,
     dirty_rect: DirtyRect,

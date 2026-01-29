@@ -1047,8 +1047,58 @@ fn keycode_to_char(keycode: sdl2::keyboard::Keycode, shift: bool) -> Option<char
 mod tests {
     use super::*;
 
+    fn should_skip_sdl2_tests() -> bool {
+        #[cfg(feature = "sdl2")]
+        {
+            if std::env::var("OPENTTD_SDL2_TESTS").as_deref() != Ok("1") {
+                return true;
+            }
+
+            if let Ok(driver) = std::env::var("SDL_VIDEODRIVER") {
+                let driver = driver.to_lowercase();
+                if matches!(driver.as_str(), "dummy" | "offscreen" | "headless") {
+                    return true;
+                }
+            }
+
+            if cfg!(target_os = "linux") {
+                let has_display =
+                    std::env::var("DISPLAY").is_ok() || std::env::var("WAYLAND_DISPLAY").is_ok();
+                if !has_display {
+                    return true;
+                }
+            }
+
+            if std::env::var("CI").is_ok() {
+                let has_display =
+                    std::env::var("DISPLAY").is_ok() || std::env::var("WAYLAND_DISPLAY").is_ok();
+                if !has_display {
+                    return true;
+                }
+            }
+
+            false
+        }
+
+        #[cfg(not(feature = "sdl2"))]
+        {
+            false
+        }
+    }
+
+    fn skip_if_headless() {
+        if should_skip_sdl2_tests() {
+            eprintln!("Skipping SDL2 video tests in headless environment");
+            return;
+        }
+    }
+
     #[test]
     fn creates_window_with_default_options() {
+        if should_skip_sdl2_tests() {
+            skip_if_headless();
+            return;
+        }
         let video = VideoSubsystem::init().expect("init ok");
         let window = video
             .create_window(
@@ -1070,6 +1120,10 @@ mod tests {
 
     #[test]
     fn toggles_window_mode() {
+        if should_skip_sdl2_tests() {
+            skip_if_headless();
+            return;
+        }
         let video = VideoSubsystem::init().expect("init ok");
         let mut window = video
             .create_window(
@@ -1089,6 +1143,10 @@ mod tests {
 
     #[test]
     fn finds_resolutions() {
+        if should_skip_sdl2_tests() {
+            skip_if_headless();
+            return;
+        }
         let video = VideoSubsystem::init().expect("init ok");
         let resolutions = video.find_resolutions();
 
@@ -1109,6 +1167,10 @@ mod tests {
 
     #[test]
     fn gets_best_video_mode() {
+        if should_skip_sdl2_tests() {
+            skip_if_headless();
+            return;
+        }
         let video = VideoSubsystem::init().expect("init ok");
 
         // In windowed mode, should return exact requested size
@@ -1124,6 +1186,10 @@ mod tests {
 
     #[test]
     fn changes_resolution() {
+        if should_skip_sdl2_tests() {
+            skip_if_headless();
+            return;
+        }
         let video = VideoSubsystem::init().expect("init ok");
         let mut window = video
             .create_window(
@@ -1141,6 +1207,10 @@ mod tests {
 
     #[test]
     fn manages_text_input() {
+        if should_skip_sdl2_tests() {
+            skip_if_headless();
+            return;
+        }
         let mut video = VideoSubsystem::init().expect("init ok");
 
         assert!(!video.is_text_input_active());
@@ -1154,6 +1224,10 @@ mod tests {
 
     #[test]
     fn stub_event_poll_returns_none() {
+        if should_skip_sdl2_tests() {
+            skip_if_headless();
+            return;
+        }
         let mut video = VideoSubsystem::init().expect("init ok");
 
         // Stub version doesn't support events
