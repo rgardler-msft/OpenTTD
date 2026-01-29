@@ -51,7 +51,7 @@ The agent(s) will then plan and execute the work required to meet those goals by
      - If new work-items are discovered during implementation create new work-items using `wl create "<work-item-title>" --description "<detailed-description-of-goals-and-context>" --issue-type <type-of-work-item> --json`. If the item must be completed in order to satisfy the requirements of the parent work-item, make the new item a child of the parent work-item using `--parent <parent-id>`. If it is an optional item make it a sibling of the <base-item-id> and add a reference to the base item in the description using `discovered-from:<base-item-id>`.
      - Regularly build and run all tests and checks to ensure nothing is broken
        - If the build or any tests/checks fail, fix the issues and repeat until all tests/checks pass
-     - Commit changes regularly with clear commit messages that reference the WIP id and summarise the changes made. When committing report back to the operator summarising the changes made and the reason for them.
+     - Commit changes whenever the Producer observes that a significant amount of progress has been made (ask if you think it is due), use clear commit messages that reference the WIP id and summarise the changes made.
    - If a particularly complex issue is identified or a significant design decisions or assumption is made record this in a comment on the work-item using `wl comment add <WIP-id> --comment "<detailed-comment>" --author @your-agent-name --json`
    - Once the acceptance criteria of <WIP-id> has been satisfied and all tests pass, Commit final changes to the branch with a message such as `<WIP-id>: Completed work to satisfy acceptance criteria: <acceptance-criteria-summary>`
    - When work is complete record a comment on the work-item summarising the changes made and the reason for them, including the commit hash using `wl comment add <id> --comment "Completed work, see commit <commit-hash> for details." --author @your-agent-name --json`
@@ -87,6 +87,8 @@ IMPORTANT: This project uses Worklog (wl) for ALL work-item tracking. Do NOT use
 ## CRITICAL RULES
 
 - Use Worklog (wl), described below, for ALL task tracking, do NOT use markdown TODOs, task lists, or other tracking methods
+- When mentioning a work item always use its title followed by its ID in parentheses, e.g. "Fix login bug (WL-1234)"
+- Always keep work items up to date with accurate status, priority, stage, and assignee
 - Whenever you are provided with, or discover, a new work item create it in wl immediately
 - Whenever you are provided with or discover important context (specifications, designs, user-stories) ensure the information is added to the description of the relevant work item(s) OR create a new work item if none exist
 - Whenever you create a planning document (PRD, spec, design doc) add references to the document in the description of any work item that is directly related to the document
