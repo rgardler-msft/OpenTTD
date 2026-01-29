@@ -4,7 +4,10 @@
 //! Currently implements the main menu as a starting point for the Rust migration.
 
 use openttd_gfx::GfxContext;
-use openttd_gui::{GraphicsSettingsAction, GraphicsSettingsWindow, MainMenuWindow, WindowManager};
+use openttd_gui::{
+    AudioSettingsAction, AudioSettingsWindow, GraphicsSettingsAction, GraphicsSettingsWindow,
+    MainMenuWindow, WindowManager,
+};
 use openttd_video::{event::Event, Sdl2Driver};
 use sdl2::mouse::MouseButton;
 use std::time::Duration;
@@ -262,6 +265,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut running = true;
     let mut last_frame = std::time::Instant::now();
     let mut graphics_settings: Option<GraphicsSettingsWindow> = None;
+    let mut audio_settings: Option<AudioSettingsWindow> = None;
 
     while running {
         // Calculate delta time
@@ -442,10 +446,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                                 // TODO: Implement multiplayer browser
                             }
                             "OPTIONS" => {
-                                println!("Opening graphics settings window");
-                                let settings = GraphicsSettingsWindow::new();
-                                openttd_gui::show_graphics_settings(&mut window_manager, &settings);
-                                graphics_settings = Some(settings);
+                                println!("Opening audio settings window");
+                                if audio_settings.is_none() {
+                                    audio_settings = Some(AudioSettingsWindow::new());
+                                }
+                                if let Some(settings) = audio_settings.as_ref() {
+                                    openttd_gui::show_audio_settings(&mut window_manager, settings);
+                                }
                             }
                             "HELP" => {
                                 println!("Help - not yet implemented");
@@ -474,12 +481,56 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                                         let _ = window_manager.remove_window(
                                             openttd_gui::GRAPHICS_SETTINGS_WINDOW_ID,
                                         );
-                                        graphics_settings = None;
+                                    } else if matches!(action, GraphicsSettingsAction::OpenAudio) {
+                                        let _ = window_manager.remove_window(
+                                            openttd_gui::GRAPHICS_SETTINGS_WINDOW_ID,
+                                        );
+                                        if audio_settings.is_none() {
+                                            audio_settings = Some(AudioSettingsWindow::new());
+                                        }
+                                        if let Some(settings) = audio_settings.as_ref() {
+                                            openttd_gui::show_audio_settings(
+                                                &mut window_manager,
+                                                settings,
+                                            );
+                                        }
                                     } else if matches!(action, GraphicsSettingsAction::None) {
                                         let refreshed = settings.build_window();
                                         let _ = window_manager.remove_window(
                                             openttd_gui::GRAPHICS_SETTINGS_WINDOW_ID,
                                         );
+                                        window_manager.add_window(refreshed);
+                                    }
+                                    continue;
+                                }
+                            }
+                        }
+
+                        if let Some(window_rect) = window_manager
+                            .get_window(openttd_gui::AUDIO_SETTINGS_WINDOW_ID)
+                            .map(|window| window.rect)
+                        {
+                            if let Some(ref mut settings) = audio_settings {
+                                if let Some(action) = settings.handle_click(x, y, window_rect) {
+                                    if matches!(action, AudioSettingsAction::Close) {
+                                        let _ = window_manager
+                                            .remove_window(openttd_gui::AUDIO_SETTINGS_WINDOW_ID);
+                                    } else if matches!(action, AudioSettingsAction::OpenVideo) {
+                                        let _ = window_manager
+                                            .remove_window(openttd_gui::AUDIO_SETTINGS_WINDOW_ID);
+                                        if graphics_settings.is_none() {
+                                            graphics_settings = Some(GraphicsSettingsWindow::new());
+                                        }
+                                        if let Some(settings) = graphics_settings.as_ref() {
+                                            openttd_gui::show_graphics_settings(
+                                                &mut window_manager,
+                                                settings,
+                                            );
+                                        }
+                                    } else if matches!(action, AudioSettingsAction::None) {
+                                        let refreshed = settings.build_window();
+                                        let _ = window_manager
+                                            .remove_window(openttd_gui::AUDIO_SETTINGS_WINDOW_ID);
                                         window_manager.add_window(refreshed);
                                     }
                                     continue;
@@ -494,12 +545,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 Event::KeyDown { keycode, .. } => {
                     // Close any open dialog windows on ESC or any keypress
                     if window_manager
+                        .get_window(openttd_gui::AUDIO_SETTINGS_WINDOW_ID)
+                        .is_some()
+                    {
+                        let _ = window_manager.remove_window(openttd_gui::AUDIO_SETTINGS_WINDOW_ID);
+                        continue;
+                    }
+
+                    if window_manager
                         .get_window(openttd_gui::GRAPHICS_SETTINGS_WINDOW_ID)
                         .is_some()
                     {
                         let _ =
                             window_manager.remove_window(openttd_gui::GRAPHICS_SETTINGS_WINDOW_ID);
-                        graphics_settings = None;
                         continue;
                     }
 

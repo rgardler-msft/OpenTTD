@@ -8,6 +8,7 @@ mod highscore;
 mod league;
 mod main_menu;
 mod main_menu_window;
+mod settings_audio;
 mod settings_graphics;
 mod toolbar;
 mod world_gen;
@@ -24,6 +25,9 @@ pub use league::{
 };
 pub use main_menu::{create_main_menu_window, handle_main_menu_click, MainMenuWidgets};
 pub use main_menu_window::{show_main_menu, MainMenuWindow};
+pub use settings_audio::{
+    show_audio_settings, AudioSettingsAction, AudioSettingsWindow, AUDIO_SETTINGS_WINDOW_ID,
+};
 pub use settings_graphics::{
     show_graphics_settings, GraphicsSettingsAction, GraphicsSettingsWindow,
     GRAPHICS_SETTINGS_WINDOW_ID,
