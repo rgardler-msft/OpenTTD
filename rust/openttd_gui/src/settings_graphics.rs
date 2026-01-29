@@ -64,6 +64,7 @@ impl Default for GraphicsSettingsState {
 pub enum GraphicsSettingsAction {
     None,
     Close,
+    OpenAudio,
 }
 
 const WINDOW_X: i32 = 140;
@@ -117,6 +118,15 @@ impl GraphicsSettingsWindow {
         let mut main_container = ContainerWidget::new_vertical(7100)
             .with_padding(12)
             .with_spacing(10);
+
+        let mut tabs = ContainerWidget::new_horizontal(7099)
+            .with_spacing(6)
+            .with_padding(0);
+        tabs.add_child(Box::new(ButtonWidget::new(7097, "Audio")));
+        tabs.add_child(Box::new(
+            LabelWidget::new(7098, "Video").with_colour(openttd_gfx::Colour::ui_highlight()),
+        ));
+        main_container.add_child(Box::new(tabs));
 
         // Display section
         let mut display_section = ContainerWidget::new_vertical(7101).with_spacing(6);
@@ -215,6 +225,12 @@ impl GraphicsSettingsWindow {
         if close_rect.contains_point(x, y) {
             println!("Graphics settings closed (not yet applied)");
             return Some(GraphicsSettingsAction::Close);
+        }
+
+        let audio_tab_rect = Rect::new(rect.x + 12, rect.y + TITLE_BAR_HEIGHT, 120, 24);
+        if audio_tab_rect.contains_point(x, y) {
+            println!("Switching to audio tab");
+            return Some(GraphicsSettingsAction::OpenAudio);
         }
 
         if resolution_rect().contains_point(x, y) {
@@ -408,5 +424,19 @@ fn action_button_at(x: i32, y: i32) -> Option<GraphicsSettingsWidgets> {
         Some(GraphicsSettingsWidgets::CancelButton)
     } else {
         None
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_graphics_settings_switch_to_audio() {
+        let mut window = GraphicsSettingsWindow::new();
+        let rect = Rect::new(WINDOW_X, WINDOW_Y, WINDOW_WIDTH, WINDOW_HEIGHT);
+        let audio_tab_rect = Rect::new(rect.x + 12, rect.y + TITLE_BAR_HEIGHT, 120, 24);
+        let action = window.handle_click(audio_tab_rect.x + 1, audio_tab_rect.y + 1, rect);
+        assert!(matches!(action, Some(GraphicsSettingsAction::OpenAudio)));
     }
 }
