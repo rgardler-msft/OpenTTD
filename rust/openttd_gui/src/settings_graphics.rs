@@ -1,10 +1,8 @@
 //! Graphics settings window
 
 use crate::{
-    ButtonWidget, ContainerWidget, LabelWidget, PanelWidget, Rect, Widget, WidgetID, Window,
-    WindowID, WindowManager,
+    ButtonWidget, ContainerWidget, LabelWidget, Rect, WidgetID, Window, WindowID, WindowManager,
 };
-use openttd_gfx::{Colour, GfxContext};
 
 /// Window ID for the graphics settings window
 pub const GRAPHICS_SETTINGS_WINDOW_ID: WindowID = 7000;
@@ -13,20 +11,15 @@ pub const GRAPHICS_SETTINGS_WINDOW_ID: WindowID = 7000;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GraphicsSettingsWidgets {
     Window = 7000,
-    Panel = 7001,
-
     DisplaySectionLabel = 7010,
     ResolutionDropdown = 7011,
     FullscreenToggle = 7012,
     VsyncToggle = 7013,
-
     InterfaceSectionLabel = 7020,
     GuiScaleDropdown = 7021,
     FontDropdown = 7022,
-
     GraphicsSectionLabel = 7030,
     BaseGraphicsDropdown = 7031,
-
     ApplyButton = 7040,
     CancelButton = 7041,
 }
@@ -37,16 +30,8 @@ impl From<GraphicsSettingsWidgets> for WidgetID {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum GraphicsDropdown {
-    Resolution,
-    GuiScale,
-    Font,
-    BaseGraphics,
-}
-
 #[derive(Debug, Clone)]
-pub struct GraphicsSettingsState {
+struct GraphicsSettingsState {
     resolutions: Vec<&'static str>,
     gui_scales: Vec<&'static str>,
     fonts: Vec<&'static str>,
@@ -57,7 +42,6 @@ pub struct GraphicsSettingsState {
     selected_base_graphics: usize,
     fullscreen: bool,
     vsync: bool,
-    dropdown_open: Option<GraphicsDropdown>,
 }
 
 impl Default for GraphicsSettingsState {
@@ -73,10 +57,23 @@ impl Default for GraphicsSettingsState {
             selected_base_graphics: 0,
             fullscreen: false,
             vsync: true,
-            dropdown_open: None,
         }
     }
 }
+
+pub enum GraphicsSettingsAction {
+    None,
+    Close,
+}
+
+const WINDOW_X: i32 = 140;
+const WINDOW_Y: i32 = 80;
+const WINDOW_WIDTH: u32 = 520;
+const WINDOW_HEIGHT: u32 = 420;
+const TITLE_BAR_HEIGHT: i32 = 20;
+const ROW_SPACING: i32 = 10;
+const SECTION_PADDING: i32 = 0;
+const SECTION_SPACING: i32 = 6;
 
 /// Graphics settings window controller
 pub struct GraphicsSettingsWindow {
@@ -94,31 +91,32 @@ impl GraphicsSettingsWindow {
         self.state.fullscreen
     }
 
-    pub fn dropdown_open(&self) -> bool {
-        self.state.dropdown_open.is_some()
+    #[cfg(test)]
+    pub fn is_dropdown_open(&self) -> bool {
+        false
     }
 
     #[cfg(test)]
-    pub fn is_dropdown_open(&self) -> bool {
-        self.state.dropdown_open.is_some()
+    pub fn resolution_rect() -> Rect {
+        resolution_rect()
+    }
+
+    #[cfg(test)]
+    pub fn fullscreen_rect() -> Rect {
+        fullscreen_rect()
     }
 
     /// Convert to a Window for the window manager
-    pub fn into_window(self) -> Window {
+    pub fn build_window(&self) -> Window {
         let mut window = Window::new(
             GRAPHICS_SETTINGS_WINDOW_ID,
             "Graphics Settings",
-            Rect::new(140, 80, 520, 420),
+            Rect::new(WINDOW_X, WINDOW_Y, WINDOW_WIDTH, WINDOW_HEIGHT),
         );
-
-        let panel = PanelWidget::new(GraphicsSettingsWidgets::Panel as WidgetID)
-            .with_colour(Colour::ui_background());
 
         let mut main_container = ContainerWidget::new_vertical(7100)
             .with_padding(12)
             .with_spacing(10);
-
-        main_container.add_child(Box::new(panel));
 
         // Display section
         let mut display_section = ContainerWidget::new_vertical(7101).with_spacing(6);
@@ -127,20 +125,25 @@ impl GraphicsSettingsWindow {
                 GraphicsSettingsWidgets::DisplaySectionLabel as WidgetID,
                 "Display Settings",
             )
-            .with_colour(Colour::ui_highlight()),
+            .with_colour(openttd_gfx::Colour::ui_highlight()),
         ));
-
-        display_section.add_child(Box::new(Self::dropdown_stub(
+        display_section.add_child(Box::new(Self::value_button(
             GraphicsSettingsWidgets::ResolutionDropdown,
-            "Resolution",
+            &format!(
+                "Resolution: {}",
+                self.state.resolutions[self.state.selected_resolution]
+            ),
         )));
-        display_section.add_child(Box::new(Self::toggle_stub(
+        display_section.add_child(Box::new(Self::value_button(
             GraphicsSettingsWidgets::FullscreenToggle,
-            "Fullscreen",
+            &format!(
+                "Fullscreen: {}",
+                if self.state.fullscreen { "On" } else { "Off" }
+            ),
         )));
-        display_section.add_child(Box::new(Self::toggle_stub(
+        display_section.add_child(Box::new(Self::value_button(
             GraphicsSettingsWidgets::VsyncToggle,
-            "VSync",
+            &format!("VSync: {}", if self.state.vsync { "On" } else { "Off" }),
         )));
 
         // Interface section
@@ -150,15 +153,18 @@ impl GraphicsSettingsWindow {
                 GraphicsSettingsWidgets::InterfaceSectionLabel as WidgetID,
                 "Interface Settings",
             )
-            .with_colour(Colour::ui_highlight()),
+            .with_colour(openttd_gfx::Colour::ui_highlight()),
         ));
-        interface_section.add_child(Box::new(Self::dropdown_stub(
+        interface_section.add_child(Box::new(Self::value_button(
             GraphicsSettingsWidgets::GuiScaleDropdown,
-            "GUI Scale",
+            &format!(
+                "GUI Scale: {}",
+                self.state.gui_scales[self.state.selected_gui_scale]
+            ),
         )));
-        interface_section.add_child(Box::new(Self::dropdown_stub(
+        interface_section.add_child(Box::new(Self::value_button(
             GraphicsSettingsWidgets::FontDropdown,
-            "Font",
+            &format!("Font: {}", self.state.fonts[self.state.selected_font]),
         )));
 
         // Base graphics section
@@ -168,15 +174,20 @@ impl GraphicsSettingsWindow {
                 GraphicsSettingsWidgets::GraphicsSectionLabel as WidgetID,
                 "Graphics Set",
             )
-            .with_colour(Colour::ui_highlight()),
+            .with_colour(openttd_gfx::Colour::ui_highlight()),
         ));
-        graphics_section.add_child(Box::new(Self::dropdown_stub(
+        graphics_section.add_child(Box::new(Self::value_button(
             GraphicsSettingsWidgets::BaseGraphicsDropdown,
-            "Base Graphics",
+            &format!(
+                "Base Graphics: {}",
+                self.state.base_graphics[self.state.selected_base_graphics]
+            ),
         )));
 
         // Action buttons
-        let mut actions = ContainerWidget::new_horizontal(7104).with_spacing(10);
+        let mut actions = ContainerWidget::new_horizontal(7104)
+            .with_spacing(10)
+            .with_padding(0);
         actions.add_child(Box::new(ButtonWidget::new(
             GraphicsSettingsWidgets::ApplyButton as WidgetID,
             "Apply",
@@ -195,276 +206,207 @@ impl GraphicsSettingsWindow {
         window
     }
 
-    pub fn draw(&self, gfx: &mut GfxContext, rect: Rect) {
-        gfx.fill_rect(rect, Colour::ui_background()).ok();
-        gfx.draw_rect(rect, Colour::ui_border()).ok();
-
-        let title_rect = Rect::new(rect.x, rect.y, rect.width, 30);
-        gfx.fill_rect(title_rect, Colour::ui_window_background())
-            .ok();
-        gfx.draw_text(
-            "GRAPHICS SETTINGS",
-            rect.x + 10,
-            rect.y + 10,
-            Colour::ui_text(),
-            None,
-        )
-        .ok();
-
-        let content_x = rect.x + 20;
-        let mut y = rect.y + 50;
-        let content_width = rect.width - 40;
-
-        y = self.draw_dropdown_row(
-            gfx,
-            content_x,
-            y,
-            content_width,
-            "Resolution",
-            self.state.resolutions[self.state.selected_resolution],
-            self.state.dropdown_open == Some(GraphicsDropdown::Resolution),
-        );
-
-        y = self.draw_toggle_row(
-            gfx,
-            content_x,
-            y,
-            content_width,
-            "Fullscreen",
-            self.state.fullscreen,
-        );
-        y = self.draw_toggle_row(gfx, content_x, y, content_width, "VSync", self.state.vsync);
-
-        y += 10;
-        y = self.draw_dropdown_row(
-            gfx,
-            content_x,
-            y,
-            content_width,
-            "GUI Scale",
-            self.state.gui_scales[self.state.selected_gui_scale],
-            self.state.dropdown_open == Some(GraphicsDropdown::GuiScale),
-        );
-        y = self.draw_dropdown_row(
-            gfx,
-            content_x,
-            y,
-            content_width,
-            "Font",
-            self.state.fonts[self.state.selected_font],
-            self.state.dropdown_open == Some(GraphicsDropdown::Font),
-        );
-
-        y += 10;
-        y = self.draw_dropdown_row(
-            gfx,
-            content_x,
-            y,
-            content_width,
-            "Base Graphics",
-            self.state.base_graphics[self.state.selected_base_graphics],
-            self.state.dropdown_open == Some(GraphicsDropdown::BaseGraphics),
-        );
-
-        // Draw dropdown list if open
-        if let Some(open) = self.state.dropdown_open {
-            let options = match open {
-                GraphicsDropdown::Resolution => &self.state.resolutions,
-                GraphicsDropdown::GuiScale => &self.state.gui_scales,
-                GraphicsDropdown::Font => &self.state.fonts,
-                GraphicsDropdown::BaseGraphics => &self.state.base_graphics,
-            };
-            self.draw_dropdown_list(
-                gfx,
-                Rect::new(content_x, y + 4, content_width, 120),
-                options,
-            );
-        }
-    }
-
-    pub fn handle_click(&mut self, x: i32, y: i32, rect: Rect) -> bool {
+    pub fn handle_click(&mut self, x: i32, y: i32, rect: Rect) -> Option<GraphicsSettingsAction> {
         if !rect.contains_point(x, y) {
-            return false;
+            return None;
         }
 
-        let content_x = rect.x + 20;
-        let content_width = rect.width - 40;
-        let mut cursor_y = rect.y + 50;
+        let close_rect = Rect::new(rect.x + rect.width as i32 - 18, rect.y + 2, 16, 16);
+        if close_rect.contains_point(x, y) {
+            println!("Graphics settings closed (not yet applied)");
+            return Some(GraphicsSettingsAction::Close);
+        }
 
-        let resolution_rect = Rect::new(content_x, cursor_y, content_width, 28);
-        cursor_y += 28;
-        let fullscreen_rect = Rect::new(content_x, cursor_y, content_width, 24);
-        cursor_y += 24;
-        let vsync_rect = Rect::new(content_x, cursor_y, content_width, 24);
-        cursor_y += 24 + 10;
-        let gui_scale_rect = Rect::new(content_x, cursor_y, content_width, 28);
-        cursor_y += 28;
-        let font_rect = Rect::new(content_x, cursor_y, content_width, 28);
-        cursor_y += 28 + 10;
-        let base_graphics_rect = Rect::new(content_x, cursor_y, content_width, 28);
+        if resolution_rect().contains_point(x, y) {
+            self.state.selected_resolution =
+                (self.state.selected_resolution + 1) % self.state.resolutions.len();
+            println!(
+                "Resolution set to {} (not yet applied)",
+                self.state.resolutions[self.state.selected_resolution]
+            );
+            return Some(GraphicsSettingsAction::None);
+        }
 
-        if resolution_rect.contains_point(x, y) {
-            self.toggle_dropdown(GraphicsDropdown::Resolution);
-            return true;
-        }
-        if gui_scale_rect.contains_point(x, y) {
-            self.toggle_dropdown(GraphicsDropdown::GuiScale);
-            return true;
-        }
-        if font_rect.contains_point(x, y) {
-            self.toggle_dropdown(GraphicsDropdown::Font);
-            return true;
-        }
-        if base_graphics_rect.contains_point(x, y) {
-            self.toggle_dropdown(GraphicsDropdown::BaseGraphics);
-            return true;
-        }
-        if fullscreen_rect.contains_point(x, y) {
+        if fullscreen_rect().contains_point(x, y) {
             self.state.fullscreen = !self.state.fullscreen;
-            return true;
+            println!(
+                "Fullscreen toggled {} (not yet applied)",
+                if self.state.fullscreen { "on" } else { "off" }
+            );
+            return Some(GraphicsSettingsAction::None);
         }
-        if vsync_rect.contains_point(x, y) {
+
+        if vsync_rect().contains_point(x, y) {
             self.state.vsync = !self.state.vsync;
-            return true;
+            println!(
+                "VSync toggled {} (not yet applied)",
+                if self.state.vsync { "on" } else { "off" }
+            );
+            return Some(GraphicsSettingsAction::None);
         }
 
-        if let Some(open) = self.state.dropdown_open {
-            if self.handle_dropdown_selection(open, x, y, content_x, cursor_y + 32, content_width) {
-                return true;
+        if gui_scale_rect().contains_point(x, y) {
+            self.state.selected_gui_scale =
+                (self.state.selected_gui_scale + 1) % self.state.gui_scales.len();
+            println!(
+                "GUI scale set to {} (not yet applied)",
+                self.state.gui_scales[self.state.selected_gui_scale]
+            );
+            return Some(GraphicsSettingsAction::None);
+        }
+
+        if font_rect().contains_point(x, y) {
+            self.state.selected_font = (self.state.selected_font + 1) % self.state.fonts.len();
+            println!(
+                "Font set to {} (not yet applied)",
+                self.state.fonts[self.state.selected_font]
+            );
+            return Some(GraphicsSettingsAction::None);
+        }
+
+        if base_graphics_rect().contains_point(x, y) {
+            self.state.selected_base_graphics =
+                (self.state.selected_base_graphics + 1) % self.state.base_graphics.len();
+            println!(
+                "Base graphics set to {} (not yet applied)",
+                self.state.base_graphics[self.state.selected_base_graphics]
+            );
+            return Some(GraphicsSettingsAction::None);
+        }
+
+        match action_button_at(x, y) {
+            Some(GraphicsSettingsWidgets::ApplyButton) => {
+                println!("Apply clicked (not yet applied)");
+                Some(GraphicsSettingsAction::Close)
             }
-            self.state.dropdown_open = None;
-            return true;
-        }
-
-        false
-    }
-
-    fn handle_dropdown_selection(
-        &mut self,
-        open: GraphicsDropdown,
-        x: i32,
-        y: i32,
-        list_x: i32,
-        list_y: i32,
-        list_width: u32,
-    ) -> bool {
-        let list_height = 120;
-        let list_rect = Rect::new(list_x, list_y, list_width, list_height);
-        if !list_rect.contains_point(x, y) {
-            return false;
-        }
-        let index = ((y - list_y) / 20).clamp(0, 3) as usize;
-        match open {
-            GraphicsDropdown::Resolution => {
-                self.state.selected_resolution = index.min(self.state.resolutions.len() - 1);
+            Some(GraphicsSettingsWidgets::CancelButton) => {
+                println!("Cancel clicked (no changes applied)");
+                Some(GraphicsSettingsAction::Close)
             }
-            GraphicsDropdown::GuiScale => {
-                self.state.selected_gui_scale = index.min(self.state.gui_scales.len() - 1);
-            }
-            GraphicsDropdown::Font => {
-                self.state.selected_font = index.min(self.state.fonts.len() - 1);
-            }
-            GraphicsDropdown::BaseGraphics => {
-                self.state.selected_base_graphics = index.min(self.state.base_graphics.len() - 1);
-            }
-        }
-        self.state.dropdown_open = None;
-        true
-    }
-
-    fn toggle_dropdown(&mut self, target: GraphicsDropdown) {
-        self.state.dropdown_open = if self.state.dropdown_open == Some(target) {
-            None
-        } else {
-            Some(target)
-        };
-    }
-
-    fn draw_dropdown_row(
-        &self,
-        gfx: &mut GfxContext,
-        x: i32,
-        y: i32,
-        width: u32,
-        label: &str,
-        value: &str,
-        open: bool,
-    ) -> i32 {
-        let label_rect = Rect::new(x, y, width, 16);
-        gfx.draw_text(label, label_rect.x, label_rect.y, Colour::ui_text(), None)
-            .ok();
-        let dropdown_rect = Rect::new(x, y + 16, width, 24);
-        gfx.draw_rect(dropdown_rect, Colour::ui_border()).ok();
-        gfx.draw_text(
-            value,
-            dropdown_rect.x + 8,
-            dropdown_rect.y + 6,
-            Colour::ui_text(),
-            None,
-        )
-        .ok();
-        if open {
-            gfx.draw_rect(
-                Rect::new(
-                    dropdown_rect.x + dropdown_rect.width as i32 - 20,
-                    dropdown_rect.y,
-                    20,
-                    24,
-                ),
-                Colour::ui_highlight(),
-            )
-            .ok();
-        }
-        y + 40
-    }
-
-    fn draw_toggle_row(
-        &self,
-        gfx: &mut GfxContext,
-        x: i32,
-        y: i32,
-        width: u32,
-        label: &str,
-        value: bool,
-    ) -> i32 {
-        let rect = Rect::new(x, y, width, 24);
-        gfx.draw_text(label, rect.x, rect.y + 4, Colour::ui_text(), None)
-            .ok();
-        let toggle_rect = Rect::new(rect.x + rect.width as i32 - 60, rect.y, 50, 22);
-        gfx.draw_rect(toggle_rect, Colour::ui_border()).ok();
-        gfx.draw_text(
-            if value { "ON" } else { "OFF" },
-            toggle_rect.x + 12,
-            toggle_rect.y + 4,
-            Colour::ui_text(),
-            None,
-        )
-        .ok();
-        y + 24
-    }
-
-    fn draw_dropdown_list(&self, gfx: &mut GfxContext, rect: Rect, options: &[&str]) {
-        gfx.fill_rect(rect, Colour::ui_window_background()).ok();
-        gfx.draw_rect(rect, Colour::ui_border()).ok();
-        let mut y = rect.y + 4;
-        for option in options.iter().take(4) {
-            gfx.draw_text(option, rect.x + 6, y, Colour::ui_text(), None)
-                .ok();
-            y += 20;
+            _ => Some(GraphicsSettingsAction::None),
         }
     }
 
-    fn dropdown_stub(id: GraphicsSettingsWidgets, label: &str) -> LabelWidget {
-        LabelWidget::new(id as WidgetID, label).with_colour(Colour::ui_text())
-    }
-
-    fn toggle_stub(id: GraphicsSettingsWidgets, label: &str) -> LabelWidget {
-        LabelWidget::new(id as WidgetID, label).with_colour(Colour::ui_text())
+    fn value_button(id: GraphicsSettingsWidgets, label: &str) -> ButtonWidget {
+        ButtonWidget::new(id as WidgetID, label)
     }
 }
 
 /// Create and show the graphics settings window
-pub fn show_graphics_settings(window_manager: &mut WindowManager) -> WindowID {
-    let window = GraphicsSettingsWindow::new().into_window();
+pub fn show_graphics_settings(
+    window_manager: &mut WindowManager,
+    settings: &GraphicsSettingsWindow,
+) -> WindowID {
+    let window = settings.build_window();
     window_manager.add_window(window)
+}
+
+fn layout_sections() -> [Rect; 4] {
+    let content_rect = Rect::new(
+        WINDOW_X,
+        WINDOW_Y + TITLE_BAR_HEIGHT,
+        WINDOW_WIDTH,
+        WINDOW_HEIGHT - TITLE_BAR_HEIGHT as u32,
+    );
+
+    let padding = 12;
+    let spacing = ROW_SPACING;
+    let count = 4;
+    let available_height = content_rect.height as i32 - 2 * padding;
+    let child_height = (available_height - (count - 1) * spacing) / count;
+    let mut rects = [Rect::new(0, 0, 0, 0); 4];
+    for i in 0..count {
+        let y = content_rect.y + padding + i * (child_height + spacing);
+        rects[i as usize] = Rect::new(
+            content_rect.x + padding,
+            y,
+            content_rect.width - (2 * padding) as u32,
+            child_height as u32,
+        );
+    }
+    rects
+}
+
+fn layout_vertical_children(parent: Rect, count: i32) -> Vec<Rect> {
+    let available_height = parent.height as i32 - 2 * SECTION_PADDING;
+    let child_height = (available_height - (count - 1) * SECTION_SPACING) / count;
+    let mut rects = Vec::new();
+    for i in 0..count {
+        let y = parent.y + SECTION_PADDING + i * (child_height + SECTION_SPACING);
+        rects.push(Rect::new(
+            parent.x + SECTION_PADDING,
+            y,
+            parent.width - (2 * SECTION_PADDING) as u32,
+            child_height as u32,
+        ));
+    }
+    rects
+}
+
+fn resolution_rect() -> Rect {
+    let sections = layout_sections();
+    let display_children = layout_vertical_children(sections[0], 4);
+    display_children[1]
+}
+
+fn fullscreen_rect() -> Rect {
+    let sections = layout_sections();
+    let display_children = layout_vertical_children(sections[0], 4);
+    display_children[2]
+}
+
+fn vsync_rect() -> Rect {
+    let sections = layout_sections();
+    let display_children = layout_vertical_children(sections[0], 4);
+    display_children[3]
+}
+
+fn gui_scale_rect() -> Rect {
+    let sections = layout_sections();
+    let interface_children = layout_vertical_children(sections[1], 3);
+    interface_children[1]
+}
+
+fn font_rect() -> Rect {
+    let sections = layout_sections();
+    let interface_children = layout_vertical_children(sections[1], 3);
+    interface_children[2]
+}
+
+fn base_graphics_rect() -> Rect {
+    let sections = layout_sections();
+    let graphics_children = layout_vertical_children(sections[2], 2);
+    graphics_children[1]
+}
+
+fn action_button_at(x: i32, y: i32) -> Option<GraphicsSettingsWidgets> {
+    let sections = layout_sections();
+    let actions_rect = sections[3];
+    if !actions_rect.contains_point(x, y) {
+        return None;
+    }
+
+    let spacing = 10;
+    let available_width = actions_rect.width as i32;
+    let button_width = (available_width - spacing) / 2;
+    let left_rect = Rect::new(
+        actions_rect.x,
+        actions_rect.y,
+        button_width as u32,
+        actions_rect.height,
+    );
+    let right_rect = Rect::new(
+        actions_rect.x + button_width + spacing,
+        actions_rect.y,
+        button_width as u32,
+        actions_rect.height,
+    );
+
+    if left_rect.contains_point(x, y) {
+        Some(GraphicsSettingsWidgets::ApplyButton)
+    } else if right_rect.contains_point(x, y) {
+        Some(GraphicsSettingsWidgets::CancelButton)
+    } else {
+        None
+    }
 }
