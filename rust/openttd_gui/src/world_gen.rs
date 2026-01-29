@@ -236,7 +236,7 @@ impl WorldGenWindow {
     }
 
     /// Convert to a Window for the window manager
-    pub fn into_window(self) -> Window {
+    pub fn build_window(&self) -> Window {
         let mut window = Window::new(
             WORLD_GEN_WINDOW_ID,
             "World Generation",
@@ -262,19 +262,19 @@ impl WorldGenWindow {
 
         climate_buttons.add_child(Box::new(ButtonWidget::new(
             WorldGenWidgets::ClimateTemperate as WidgetID,
-            "🌲 Temperate",
+            climate_button_label(Climate::Temperate, self.config.climate),
         )));
         climate_buttons.add_child(Box::new(ButtonWidget::new(
             WorldGenWidgets::ClimateArctic as WidgetID,
-            "❄️ Arctic",
+            climate_button_label(Climate::Arctic, self.config.climate),
         )));
         climate_buttons.add_child(Box::new(ButtonWidget::new(
             WorldGenWidgets::ClimateTropical as WidgetID,
-            "🌴 Tropical",
+            climate_button_label(Climate::Tropical, self.config.climate),
         )));
         climate_buttons.add_child(Box::new(ButtonWidget::new(
             WorldGenWidgets::ClimateToyland as WidgetID,
-            "🎪 Toyland",
+            climate_button_label(Climate::Toyland, self.config.climate),
         )));
 
         climate_section.add_child(Box::new(climate_buttons));
@@ -288,12 +288,12 @@ impl WorldGenWindow {
         )));
         map_size_section.add_child(Box::new(ButtonWidget::new(
             WorldGenWidgets::MapSizeXDropdown as WidgetID,
-            "512",
+            &self.config.map_size_x.name(),
         )));
         map_size_section.add_child(Box::new(LabelWidget::new(6211, "x")));
         map_size_section.add_child(Box::new(ButtonWidget::new(
             WorldGenWidgets::MapSizeYDropdown as WidgetID,
-            "512",
+            &self.config.map_size_y.name(),
         )));
         main_container.add_child(Box::new(map_size_section));
 
@@ -305,7 +305,7 @@ impl WorldGenWindow {
         )));
         terrain_section.add_child(Box::new(ButtonWidget::new(
             WorldGenWidgets::TerrainTypeDropdown as WidgetID,
-            "Hilly",
+            self.config.terrain_type.name(),
         )));
         main_container.add_child(Box::new(terrain_section));
 
@@ -317,7 +317,7 @@ impl WorldGenWindow {
         )));
         sea_level_section.add_child(Box::new(ButtonWidget::new(
             WorldGenWidgets::SeaLevelDropdown as WidgetID,
-            "Medium",
+            self.config.sea_level.name(),
         )));
         main_container.add_child(Box::new(sea_level_section));
 
@@ -329,7 +329,7 @@ impl WorldGenWindow {
         )));
         towns_section.add_child(Box::new(ButtonWidget::new(
             WorldGenWidgets::NumTownsDropdown as WidgetID,
-            "Normal",
+            self.config.town_count.name(),
         )));
         main_container.add_child(Box::new(towns_section));
 
@@ -341,7 +341,7 @@ impl WorldGenWindow {
         )));
         industries_section.add_child(Box::new(ButtonWidget::new(
             WorldGenWidgets::NumIndustriesDropdown as WidgetID,
-            "Normal",
+            self.config.industry_count.name(),
         )));
         main_container.add_child(Box::new(industries_section));
 
@@ -357,7 +357,7 @@ impl WorldGenWindow {
         )));
         date_section.add_child(Box::new(ButtonWidget::new(
             WorldGenWidgets::StartDateText as WidgetID,
-            "1950",
+            &format!("{}", self.config.start_year),
         )));
         date_section.add_child(Box::new(ButtonWidget::new(
             WorldGenWidgets::StartDateUp as WidgetID,
@@ -373,7 +373,7 @@ impl WorldGenWindow {
         )));
         seed_section.add_child(Box::new(ButtonWidget::new(
             WorldGenWidgets::RandomSeedText as WidgetID,
-            "Random",
+            &random_seed_label(self.config.random_seed),
         )));
         main_container.add_child(Box::new(seed_section));
 
@@ -392,10 +392,134 @@ impl WorldGenWindow {
         window.set_root_widget(Box::new(main_container));
         window
     }
+
+    pub fn apply_action(&mut self, action: &str) -> bool {
+        match action {
+            "CLIMATE_TEMPERATE" => self.config.climate = Climate::Temperate,
+            "CLIMATE_ARCTIC" => self.config.climate = Climate::Arctic,
+            "CLIMATE_TROPICAL" => self.config.climate = Climate::Tropical,
+            "CLIMATE_TOYLAND" => self.config.climate = Climate::Toyland,
+            "CYCLE_MAP_SIZE_X" => self.config.map_size_x = next_map_size(self.config.map_size_x),
+            "CYCLE_MAP_SIZE_Y" => self.config.map_size_y = next_map_size(self.config.map_size_y),
+            "CYCLE_TERRAIN_TYPE" => {
+                self.config.terrain_type = next_terrain_type(self.config.terrain_type)
+            }
+            "CYCLE_SEA_LEVEL" => self.config.sea_level = next_sea_level(self.config.sea_level),
+            "CYCLE_NUM_TOWNS" => self.config.town_count = next_town_count(self.config.town_count),
+            "CYCLE_NUM_INDUSTRIES" => {
+                self.config.industry_count = next_industry_count(self.config.industry_count)
+            }
+            "YEAR_UP" => self.config.start_year = self.config.start_year.saturating_add(1),
+            "YEAR_DOWN" => self.config.start_year = self.config.start_year.saturating_sub(1),
+            _ => return false,
+        }
+        true
+    }
 }
 
 /// Show the world generation window
-pub fn show_world_gen(window_manager: &mut WindowManager) -> WindowID {
-    let world_gen = WorldGenWindow::new();
-    window_manager.add_window(world_gen.into_window())
+pub fn show_world_gen(window_manager: &mut WindowManager, world_gen: &WorldGenWindow) -> WindowID {
+    let window = world_gen.build_window();
+    window_manager.add_window(window)
+}
+
+fn climate_button_label(climate: Climate, selected: Climate) -> String {
+    if climate == selected {
+        format!("▶ {}", climate.name())
+    } else {
+        climate.name().to_string()
+    }
+}
+
+fn random_seed_label(seed: u32) -> String {
+    if seed == 0 {
+        "Random".to_string()
+    } else {
+        seed.to_string()
+    }
+}
+
+fn next_map_size(size: MapSize) -> MapSize {
+    match size {
+        MapSize::Size64 => MapSize::Size128,
+        MapSize::Size128 => MapSize::Size256,
+        MapSize::Size256 => MapSize::Size512,
+        MapSize::Size512 => MapSize::Size1024,
+        MapSize::Size1024 => MapSize::Size2048,
+        MapSize::Size2048 => MapSize::Size4096,
+        MapSize::Size4096 => MapSize::Size64,
+    }
+}
+
+fn next_terrain_type(terrain: TerrainType) -> TerrainType {
+    match terrain {
+        TerrainType::VeryFlat => TerrainType::Flat,
+        TerrainType::Flat => TerrainType::Hilly,
+        TerrainType::Hilly => TerrainType::Mountainous,
+        TerrainType::Mountainous => TerrainType::Custom,
+        TerrainType::Custom => TerrainType::VeryFlat,
+    }
+}
+
+fn next_sea_level(level: SeaLevel) -> SeaLevel {
+    match level {
+        SeaLevel::VeryLow => SeaLevel::Low,
+        SeaLevel::Low => SeaLevel::Medium,
+        SeaLevel::Medium => SeaLevel::High,
+        SeaLevel::High => SeaLevel::Custom,
+        SeaLevel::Custom => SeaLevel::VeryLow,
+    }
+}
+
+fn next_town_count(count: TownCount) -> TownCount {
+    match count {
+        TownCount::VeryLow => TownCount::Low,
+        TownCount::Low => TownCount::Normal,
+        TownCount::Normal => TownCount::High,
+        TownCount::High => TownCount::Custom,
+        TownCount::Custom => TownCount::VeryLow,
+    }
+}
+
+fn next_industry_count(count: IndustryCount) -> IndustryCount {
+    match count {
+        IndustryCount::None => IndustryCount::VeryLow,
+        IndustryCount::VeryLow => IndustryCount::Low,
+        IndustryCount::Low => IndustryCount::Normal,
+        IndustryCount::Normal => IndustryCount::High,
+        IndustryCount::High => IndustryCount::None,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_world_gen_apply_action_updates_config() {
+        let mut window = WorldGenWindow::new();
+        assert!(window.apply_action("CLIMATE_TROPICAL"));
+        assert_eq!(window.config.climate, Climate::Tropical);
+
+        let previous_size = window.config.map_size_x;
+        assert!(window.apply_action("CYCLE_MAP_SIZE_X"));
+        assert_ne!(window.config.map_size_x, previous_size);
+    }
+
+    #[test]
+    fn test_world_gen_year_changes() {
+        let mut window = WorldGenWindow::new();
+        let start_year = window.config.start_year;
+        assert!(window.apply_action("YEAR_UP"));
+        assert_eq!(window.config.start_year, start_year + 1);
+        assert!(window.apply_action("YEAR_DOWN"));
+        assert_eq!(window.config.start_year, start_year);
+    }
+
+    #[test]
+    fn test_world_gen_window_id_and_title() {
+        let window = WorldGenWindow::new().build_window();
+        assert_eq!(window.id, WORLD_GEN_WINDOW_ID);
+        assert_eq!(window.title, "World Generation");
+    }
 }

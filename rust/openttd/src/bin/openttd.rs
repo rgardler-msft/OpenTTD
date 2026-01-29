@@ -6,7 +6,7 @@
 use openttd_gfx::GfxContext;
 use openttd_gui::{
     AudioSettingsAction, AudioSettingsWindow, GameplaySettingsAction, GameplaySettingsWindow,
-    GraphicsSettingsAction, GraphicsSettingsWindow, MainMenuWindow, WindowManager,
+    GraphicsSettingsAction, GraphicsSettingsWindow, MainMenuWindow, WindowManager, WorldGenWindow,
 };
 use openttd_video::{event::Event, Sdl2Driver};
 use sdl2::mouse::MouseButton;
@@ -157,6 +157,18 @@ fn handle_world_gen_action(window_manager: &mut WindowManager, x: i32, y: i32) -
         return Some("CYCLE_SEA_LEVEL".to_string());
     }
 
+    // Number of towns button (y: 250-280, x: 180-360)
+    if local_y >= 250 && local_y <= 280 && local_x >= 180 && local_x <= 360 {
+        println!("Number of towns button clicked - cycling through counts");
+        return Some("CYCLE_NUM_TOWNS".to_string());
+    }
+
+    // Number of industries button (y: 300-330, x: 180-360)
+    if local_y >= 300 && local_y <= 330 && local_x >= 180 && local_x <= 360 {
+        println!("Number of industries button clicked - cycling through counts");
+        return Some("CYCLE_NUM_INDUSTRIES".to_string());
+    }
+
     // Year selector buttons (y: 350-380)
     if local_y >= 350 && local_y <= 380 {
         // Down button (x: 180-210)
@@ -267,6 +279,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut graphics_settings: Option<GraphicsSettingsWindow> = None;
     let mut audio_settings: Option<AudioSettingsWindow> = None;
     let mut gameplay_settings: Option<GameplaySettingsWindow> = None;
+    let mut world_gen: Option<WorldGenWindow> = None;
 
     while running {
         // Calculate delta time
@@ -333,19 +346,47 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                             }
                             action if action.starts_with("CLIMATE_") => {
                                 println!("Climate selection: {}", action);
-                                // TODO: Update the world gen config with selected climate
+                                if let Some(ref mut world_gen_state) = world_gen {
+                                    if world_gen_state.apply_action(&action) {
+                                        let refreshed = world_gen_state.build_window();
+                                        let _ = window_manager
+                                            .remove_window(openttd_gui::WORLD_GEN_WINDOW_ID);
+                                        window_manager.add_window(refreshed);
+                                    }
+                                }
                             }
                             action if action.starts_with("CYCLE_") => {
                                 println!("Cycling dropdown: {}", action);
-                                // TODO: Update the dropdown display with next value in sequence
+                                if let Some(ref mut world_gen_state) = world_gen {
+                                    if world_gen_state.apply_action(&action) {
+                                        let refreshed = world_gen_state.build_window();
+                                        let _ = window_manager
+                                            .remove_window(openttd_gui::WORLD_GEN_WINDOW_ID);
+                                        window_manager.add_window(refreshed);
+                                    }
+                                }
                             }
                             "YEAR_UP" => {
                                 println!("Incrementing start year");
-                                // TODO: Increase year value and update display
+                                if let Some(ref mut world_gen_state) = world_gen {
+                                    if world_gen_state.apply_action(action.as_str()) {
+                                        let refreshed = world_gen_state.build_window();
+                                        let _ = window_manager
+                                            .remove_window(openttd_gui::WORLD_GEN_WINDOW_ID);
+                                        window_manager.add_window(refreshed);
+                                    }
+                                }
                             }
                             "YEAR_DOWN" => {
                                 println!("Decrementing start year");
-                                // TODO: Decrease year value and update display
+                                if let Some(ref mut world_gen_state) = world_gen {
+                                    if world_gen_state.apply_action(action.as_str()) {
+                                        let refreshed = world_gen_state.build_window();
+                                        let _ = window_manager
+                                            .remove_window(openttd_gui::WORLD_GEN_WINDOW_ID);
+                                        window_manager.add_window(refreshed);
+                                    }
+                                }
                             }
                             _ => {
                                 println!("World gen action not yet implemented: {}", action);
@@ -419,7 +460,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                                     main_menu.visible = false;
                                 }
                                 // Show world generation window
-                                openttd_gui::show_world_gen(&mut window_manager);
+                                if world_gen.is_none() {
+                                    world_gen = Some(WorldGenWindow::new());
+                                }
+                                if let Some(world_gen_state) = world_gen.as_ref() {
+                                    openttd_gui::show_world_gen(
+                                        &mut window_manager,
+                                        world_gen_state,
+                                    );
+                                }
                             }
                             "LOAD_GAME" => {
                                 println!("Load Game - not yet implemented");
